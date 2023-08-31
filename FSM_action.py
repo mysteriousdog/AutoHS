@@ -10,6 +10,7 @@ from strategy import StrategyState
 from log_state import *
 import threading
 import strategy
+import predict_model
 FSM_state = ""
 time_begin = 0.0
 game_count = 0
@@ -281,11 +282,14 @@ def Battling():
         strategy_state = StrategyState(log_state)
         input_info = strategy_state.debug_print_out()
         print("input_info is :", input_info)
+        if len(input_info[-1]) != 3:
+            predict_input_info = predict_model.predict_action(input_info)
+            print("predict_input_info is :", predict_input_info)
         time.sleep(1)
         # return FSM_BATTLING
         # if len(input_info) == 3:
         if len(input_info) >= 2 and len(input_info[-1]) == 3:
-            print("action from user_input: ", input_info)
+            # print("action from user_input: ", input_info)
             get_index = input_info[-1][0]
             put_index = input_info[-1][1]
             point_index = input_info[-1][2]

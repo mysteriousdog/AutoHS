@@ -32,4 +32,4 @@ loss, accuracy = model.evaluate(X_test, y_test)
 print("loss is :", loss)
 print("accuracy is :", accuracy)
 # 将模型保存为文件
-model.save('my_old_hunter_model.keras')
+model.save('my_hunter_model.keras')

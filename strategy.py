@@ -200,10 +200,12 @@ class StrategyState:
             atk = my_minion.attack
             health = my_minion.health
             protect = 0
-            damage = 0
+            damage = atk
             if my_minion.taunt:
                 protect = health
-            temp = [0, 0, total_mana, 1, 2, 2, atk, health, 0, 0, 0, atk, protect]
+            if my_minion.exhausted:
+                damage = 0
+            temp = [0, 0, total_mana, 1, 2, 2, atk, health, 0, 0, 0, damage, protect]
             infolist.append(temp)
 
        
