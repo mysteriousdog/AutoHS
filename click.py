@@ -247,3 +247,60 @@ def enter_HS():
 
     left, top, right, bottom = win32gui.GetWindowRect(battlenet_hwnd)
     left_click(left + 180, bottom - 110)
+
+
+def enter_HS_step_2():
+    rand_sleep(1)
+
+    if test_hs_available():
+        move_window_foreground(get_HS_hwnd(), "炉石传说")
+        return
+
+    battlenet_hwnd = get_battlenet_hwnd()
+
+    if battlenet_hwnd == 0:
+        error_print("未找到应用战网")
+        sys.exit()
+
+    move_window_foreground(battlenet_hwnd, "战网")
+
+    rand_sleep(1)
+
+    left, top, right, bottom = win32gui.GetWindowRect(battlenet_hwnd)
+    left_click(left + 280, bottom - 600)
+    time.sleep(1)
+    left_click(left + 180, bottom - 110)
+    time.sleep(18)
+    from pynput.keyboard import Controller, Key
+    keyboard = Controller()
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+    keyboard.press(Key.esc)
+    keyboard.release(Key.esc)
+
+
+def enter_BATTLE():
+    rand_sleep(1)
+    battlenet_hwnd = get_battlenet_hwnd()
+
+    if battlenet_hwnd == 0:
+        error_print("未找到应用战网")
+        sys.exit()
+
+    move_window_foreground(battlenet_hwnd, "Battle.net")
+    rand_sleep(1)
+    left, top, right, bottom = win32gui.GetWindowRect(battlenet_hwnd)
+    return (left, top, right, bottom)
+

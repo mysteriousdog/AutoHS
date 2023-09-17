@@ -1,6 +1,6 @@
 from card.basic_card import *
-
-
+import statistics
+BrandonKitkouski_used_before = 0
 # 护甲商贩
 class ArmorVendor(MinionNoPoint):
     value = 2
@@ -277,3 +277,382 @@ class SoulMirror(SpellNoPoint):
 class BloodOfGhuun(MinionNoPoint):
     value = 8
     keep_in_hand_bool = False
+
+class ArcaneShot(SpellPointOppo):
+    wait_time = 2
+    # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
+    bias = -2.5
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_oppo_index = -1
+        best_delta_h = 0
+        if state.oppo_hero.can_be_pointed_by_spell:
+           best_delta_h = state.oppo_hero.delta_h_after_damage(2) + cls.bias
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            temp_delta_h = oppo_minion.delta_h_after_damage(2) + cls.bias
+            if temp_delta_h > best_delta_h:
+                best_delta_h = temp_delta_h
+                best_oppo_index = oppo_index
+
+        return best_delta_h, best_oppo_index
+
+#惩罚 -水晶（1：1） - 卡牌（1：1） - 被动（0.5）
+
+#奖励 +过牌（1：1） + 冷冻（1：1）
+
+# 爆炸陷阱
+class BrandonKitkouski(SpellNoPoint):
+   
+    bias = -3
+    
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        global BrandonKitkouski_used_before
+        print("in BrandonKitkouski BrandonKitkouski_used_before is ", BrandonKitkouski_used_before)
+        if BrandonKitkouski_used_before == 0:
+            BrandonKitkouski_used_before = 1;
+            return 1000000,
+        if BrandonKitkouski_used_before == 1:
+            for entity in state.my_graveyard:
+                if entity.name == "爆炸陷阱":
+                    return cls.bias + sum([minion.delta_h_after_damage(2)
+                               for minion in state.oppo_minions]) + state.oppo_hero.delta_h_after_damage(2),
+            return -99999999,
+        return cls.bias + sum([minion.delta_h_after_damage(2)
+                               for minion in state.oppo_minions]) + state.oppo_hero.delta_h_after_damage(2),
+
+#快速射击
+class QuickShot(SpellPointOppo):
+    wait_time = 2
+    # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
+    bias = -3
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_oppo_index = -1
+        best_delta_h = 0
+        if state.my_hand_card_num == 1:
+            cls.value += 10
+        if state.oppo_hero.can_be_pointed_by_spell:
+           best_delta_h = state.oppo_hero.delta_h_after_damage(3) + cls.bias
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            temp_delta_h = oppo_minion.delta_h_after_damage(3) + cls.bias
+            if temp_delta_h > best_delta_h:
+                best_delta_h = temp_delta_h
+                best_oppo_index = oppo_index
+
+        return best_delta_h, best_oppo_index
+   
+# 致命射击
+class DeadlyShot(SpellNoPoint):
+    bias = -5
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        if state.oppo_minion_num == 0:
+            return -999, 
+        return cls.bias + statistics.mean([minion.heuristic_val
+                               for minion in state.oppo_minions]),
+
+# 动物伙伴
+class AnimalCompanion(SpellNoPoint):
+    bias = -4
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        return cls.bias + (10 + 9 + 7) / 3,
+
+# 狼人渗透者
+class WorgenInfiltrator(MinionNoPoint):
+    value = 3
+    keep_in_hand_bool = True
+
+# 冰川裂片
+class GlacialShard(MinionPointOppo):
+    keep_in_hand_bool = True
+    value = 3
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        best_h = cls.value + state.oppo_hero.heuristic_val / 10
+        best_oppo_index = -1
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_minion:
+                continue
+
+            delta_h = cls.value +  oppo_minion.heuristic_val / 2
+            if delta_h > best_h:
+                best_h = delta_h
+                best_oppo_index = oppo_index
+
+        return best_h, state.my_minion_num, best_oppo_index
+
+# 吸血蚊
+class LifeDrinker(MinionNoPoint):
+    value = 6
+    keep_in_hand_bool = False
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        if state.oppo_hero.health <= 15:
+            cls.value += 1
+        if state.my_hero.health <= 27:
+            cls.value += 0.5
+        if state.my_hero.health <= 15:
+            cls.value += 1
+        if state.my_hero.health <= 10:
+            cls.value += 1
+        if state.my_hero.health <= 5:
+            cls.value += 1
+        return cls.value, state.my_minion_num
+
+# 恐狼前锋
+class DireWolfAlpha(MinionNoPoint):
+    keep_in_hand_bool = True
+    value = 4
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        if state.my_minion_num == 1:
+            cls.value += 1
+        elif state.my_minion_num > 1:
+            cls.value += 2
+        return cls.value, state.my_minion_num - 1
+
+# 战利品贮藏者
+class LootHoarder(MinionNoPoint):
+    keep_in_hand_bool = True
+    value = 3
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        cls.value += (10 - state.my_hand_card_num) / 2
+        return cls.value, state.my_minion_num
+
+# 精灵龙
+class FaerieDragon(MinionNoPoint):
+    keep_in_hand_bool = True
+    value = 5
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        if state.oppo_hero_power.name == "火球术" or state.oppo_hero_power.name == "次级治疗术" or state.oppo_hero_power.name == "生命分流":
+            cls.value += 1
+        return cls.value, state.my_minion_num
+
+# 异教低阶牧师
+class CultNeophyte(MinionNoPoint):
+    keep_in_hand_bool = True
+    value = 5
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        if state.my_total_mana >= 3:
+            cls.value += 0.5
+        if state.oppo_hero_power.name == "火球术" or state.oppo_hero_power.name == "次级治疗术" or state.oppo_hero_power.name == "生命分流":
+            cls.value += 0.5
+        return cls.value, state.my_minion_num
+
+# 碧蓝幼龙
+class BlueDrogen(MinionNoPoint):
+    value = 10
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        cls.value += (10 - state.my_hand_card_num) / 2
+        return cls.value, state.my_minion_num
+    
+
+
+############################################################
+# 烈焰喷泉
+class FlamingFountain(SpellPointOppo):
+    wait_time = 2
+    # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
+    bias = -2
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_oppo_index = -1
+        best_delta_h = 0
+        if state.oppo_hero.can_be_pointed_by_spell:
+           best_delta_h = state.oppo_hero.delta_h_after_damage(2) + cls.bias
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            temp_delta_h = oppo_minion.delta_h_after_damage(2) + cls.bias
+            if temp_delta_h > best_delta_h:
+                best_delta_h = temp_delta_h
+                best_oppo_index = oppo_index
+
+        return best_delta_h, best_oppo_index
+    
+# 电火花
+class spark(SpellPointOppo):
+    wait_time = 2
+    # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
+    bias = -2
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_oppo_index = -1
+        best_delta_h = 0
+        temp_opoo_minion = None
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            temp_opoo_minion = oppo_minion
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            temp_delta_h = oppo_minion.delta_h_after_damage(1) + cls.bias
+            if temp_opoo_minion != None:
+                temp_delta_h += temp_opoo_minion.delta_h_after_damage(1) + cls.bias
+            try:
+                temp_delta_h += state.oppo_minions[oppo_index + 1].delta_h_after_damage(1) + cls.bias
+            except:
+                if temp_delta_h > best_delta_h:
+                    best_delta_h = temp_delta_h
+                    best_oppo_index = oppo_index
+
+            if temp_delta_h > best_delta_h:
+                best_delta_h = temp_delta_h
+                best_oppo_index = oppo_index
+
+        return best_delta_h, best_oppo_index
+
+IceBarrier_used = 0
+# 寒冰护体
+class IceBarrier(SpellNoPoint):
+    bias = -4
+    bias += 8
+    
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        global IceBarrier_used
+        if IceBarrier_used == 1:
+            return -11111,
+        if IceBarrier_used == 0:
+            IceBarrier_used = 1
+        if state.my_hero.health <= 20:
+            return cls.bias + 1,
+        if state.my_hero.health <= 15:
+            return cls.bias + 1.5,
+        if state.my_hero.health <= 10:
+            return cls.bias + 3,
+        if state.my_hero.health <= 5:
+            return cls.bias + 990,
+        return cls.bias, 
+
+# 焦油蠕行者
+class TarCreeper(MinionNoPoint):
+    value = 7
+    keep_in_hand_bool = True
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        if state.my_minion_num > 0:
+             return cls.value + 0.5, state.my_minion_num
+        if state.my_hero.health <= 15:
+            return cls.value + 1.5, state.my_minion_num
+        if state.my_hero.health <= 10:
+            return cls.value + 3, state.my_minion_num
+        if state.my_hero.health <= 5:
+            return cls.value + 8, state.my_minion_num
+        return cls.value, state.my_minion_num
+
+# 秘法智力
+class Esotericintelligence(SpellNoPoint):
+    bias = -4
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_oppo_index = -1
+        best_delta_h = 0
+        best_delta_h += cls.bias + (7 - state.my_hand_card_num) * 1.8
+
+        return best_delta_h, 
+
+# 苦痛侍僧
+class PainfulServantMonk(MinionNoPoint):
+    value = 4
+    keep_in_hand_bool = True
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        
+        return cls.value + (8 - state.my_hand_card_num) * 1.8, state.my_minion_num
+    
+#森金御盾大师
+class MasterSenjinYudun(MinionNoPoint):
+    value = 9.5
+    keep_in_hand_bool = True
+
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        if state.my_minion_num >= 1:
+            cls.value += 1
+        if state.my_hero.health <= 15:
+            return cls.value + 1.5, state.my_minion_num
+        if state.my_hero.health <= 10:
+            return cls.value + 3, state.my_minion_num
+        if state.my_hero.health <= 5:
+            return cls.value + 20, state.my_minion_num
+        return cls.value, state.my_minion_num
+
+# 火球术
+class FireBall(SpellPointOppo):
+    wait_time = 2
+    # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
+    bias = -5
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_oppo_index = -1
+        best_delta_h = 0
+        if state.oppo_hero.can_be_pointed_by_spell:
+           best_delta_h = state.oppo_hero.delta_h_after_damage(6) + cls.bias
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            temp_delta_h = oppo_minion.delta_h_after_damage(6) + cls.bias
+            if temp_delta_h > best_delta_h:
+                best_delta_h = temp_delta_h
+                best_oppo_index = oppo_index
+
+        return best_delta_h, best_oppo_index
+
+# 暴风雪
+class SnowStorm(SpellNoPoint):
+    bias = -7
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        return cls.bias + sum([minion.delta_h_after_damage(2) + 1
+                               for minion in state.oppo_minions]),
+
+# 火源传送门
+class FireSourceTransmissionGate(SpellPointOppo):
+    wait_time = 2
+    # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
+    bias = -8 + 10
+
+    @classmethod
+    def best_h_and_arg(cls, state, hand_card_index):
+        best_oppo_index = -1
+        best_delta_h = 0
+        if state.oppo_hero.can_be_pointed_by_spell:
+           best_delta_h = state.oppo_hero.delta_h_after_damage(6) + cls.bias
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            temp_delta_h = oppo_minion.delta_h_after_damage(6) + cls.bias
+            if temp_delta_h > best_delta_h:
+                best_delta_h = temp_delta_h
+                best_oppo_index = oppo_index
+
+        return best_delta_h, best_oppo_index

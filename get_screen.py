@@ -113,6 +113,12 @@ def catch_screen(name=None):
 
 def pixel_very_similar(im_opencv, y, x, expected_val):
     img_val = im_opencv[y][x][:3]
+    # print("==========================================================================")
+    # print(expected_val[0])
+    # print(img_val[0])
+    # print(img_val[1])
+    # print(img_val[2])
+    # print("==========================================================================")
     diff = abs(img_val[0] - expected_val[0]) + \
            abs(img_val[1] - expected_val[1]) + \
            abs(img_val[2] - expected_val[2])

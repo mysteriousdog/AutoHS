@@ -38,6 +38,35 @@ ID2CARD_DICT = {
     "BT_198": SoulMirror,  # 灵魂之镜
     "DMF_053": BloodOfGhuun,  # 戈霍恩之血
 
+
+    # 标准模式-猎人
+    "CORE_DS1_185" : ArcaneShot, # 奥数射击
+    "CORE_EX1_610" : BrandonKitkouski, # 爆炸陷阱
+    "CORE_BRM_013" : QuickShot, # 快速射击
+    "CORE_EX1_617" : DeadlyShot, # 致命射击
+    "CORE_NEW1_031" : AnimalCompanion, # 动物伙伴
+    "CORE_EX1_010" : WorgenInfiltrator, # 狼人渗透者
+    "CORE_UNG_205" : GlacialShard, # 冰川裂片
+    "CORE_GIL_622" : LifeDrinker, # 吸血蚊
+    "CORE_EX1_162" : DireWolfAlpha, # 恐狼前锋
+    "CORE_EX1_096" : LootHoarder, # 战利品贮藏者
+    "CORE_NEW1_023" : FaerieDragon, # 精灵龙
+    "CORE_SCH_713" : CultNeophyte, # 异教低阶牧师
+    "CORE_EX1_284" : BlueDrogen, # 碧蓝幼龙
+
+    #标准模式-法师
+    "CORE_UNG_018" : FlamingFountain, # 烈焰喷泉
+    "CORE_BOT_453" : spark, # 电火花
+    "CORE_EX1_289" : IceBarrier, # 寒冰护体
+    "CORE_UNG_928" : TarCreeper, # 焦油蠕行者
+    "CORE_CS2_023" : Esotericintelligence, #秘法智力
+    "CORE_EX1_007" : PainfulServantMonk, #苦痛侍僧
+    "CORE_CS2_179" : MasterSenjinYudun, #森金御盾大师
+    "CORE_CS2_029" : FireBall, # 火球术
+    "CORE_CS2_028" : SnowStorm, # 暴风雪
+    "CORE_KAR_076" : FireSourceTransmissionGate, # 火源传送门
+
+
     # 经典模式
     "VAN_CS2_042": FireElemental,
     "VAN_EX1_562": Onyxia,

@@ -68,7 +68,7 @@ def test_main_start_reward_click_prev_reward_click():
     left_click(x, y)
 
 SINGLE_MAIN_MENU_XY = {
-     CLICK_ANOTHER_MODE : (1350, 450),
+     CLICK_ANOTHER_MODE : (1350, 470),
      CLICK_PRITICE_MODE : (1350, 150),
      CLICK_PRITICE_MODE_NEXT : (1350, 210),
      CLICK_PRITICE_MODE_NEXT_START_GAME : (1450, 900),
@@ -436,8 +436,218 @@ def test_CHOSE_OWN_x_x_click(index, size):
     x, y = CHOSE_OWN_MENU_XY[key]
     left_click(x, y)
 
+
+def goto_cradstore_from_single():
+    enter_HS()
+    left_click(700, 980)
+
+def goto_add_new_card():
+    enter_HS()
+    left_click(1500, 350)
+
+def confirm_add_new_card():
+    enter_HS()
+    left_click(850, 620)
+
+def confirm_complete_new_card():
+    enter_HS()
+    left_click(1600, 1000)
+
+def left_confirm_complete_new_card():
+    enter_HS()
+    left_click(1600, 1000)
+
+def add_new_hunter_cards_from_single(): # 从冒险模式战斗结束到进入牌库进行卡组创建，创建完成后推出到main
+    goto_cradstore_from_single()
+    time.sleep(1)
+    import pyperclip
+    string_to_copy = "AAECAR8AD6qfBOOfBOWfBJagBJqgBKGgBKSgBLugBLi0BInUBKDUBKTUBKnUBNCeBtOeBgAA"
+    pyperclip.copy(string_to_copy)
+    import click
+    click.test_click()
+    click.test_click()
+    click.test_click()
+    click.test_click()
+    click.test_click()
+    click.test_click()
+    goto_add_new_card()
+    confirm_add_new_card()
+    time.sleep(10)
+    confirm_complete_new_card()
+    time.sleep(1)
+    left_confirm_complete_new_card()
+    time.sleep(1)
+    test_single_chose_hero_x_click(1)
+    time.sleep(1)
+    left_confirm_complete_new_card()
+    time.sleep(1)
+    left_confirm_complete_new_card()
+
+
+def goto_fight_single_hunter_from_main(): # 从main到进入冒险模式战斗
+    time.sleep(1)
+    test_main_start_single_game_click()
+    time.sleep(1)
+    test_single_main_start_game_click()
+    time.sleep(1)
+    test_single_game_start_click()
+    time.sleep(1)
+    test_single_chose_hero_oppo_x_click(3)
+    time.sleep(1)
+    test_single_game_start_click()
+    from FSM_action import system_exit, AutoHS_automata
+    import keyboard
+    from log_state import check_name
+    from print_info import print_info_init
+    from FSM_action import init
+
+    check_name()
+    print_info_init()
+    init()
+    keyboard.add_hotkey("ctrl+q", system_exit)
+    AutoHS_automata(1)
+
+def click_zuixindongtaicancel():
+    enter_HS()
+    left_click(1420, 210)
+
+def click_hs_from_battle():
+    enter_HS()
+    left_click(260, 200)
+    time.sleep(1)
+    left_click(960, 200)
+
+def hs_left_new_commer_to_mian():
+    # time.slppe(10)
+    enter_HS()
+    # left_click(1000, 500)
+    # time.slppe(10)
+    # left_click(1850, 50)
+    # time.sleep(1)
+    # left_click(850, 620)
+    # time.sleep(10)
+    left_click(1000, 50)
+    left_click(1000, 50)
+    left_click(1000, 50)
+
+
+def chose_clear_reput_mail_line(mail):
+    # (left, top, right, bottom) = enter_BATTLE()
+    # print(left, top, right, bottom)
+    left_click(1050, 550)
+    time.sleep(0.5)
+    from pynput.keyboard import Controller, Key
+    keyboard = Controller()
+    time.sleep(0.5)
+    i = 0
+    while (i < 30):
+        i += 1
+        keyboard.press(Key.backspace)
+        time.sleep(0.1)
+        keyboard.release(Key.backspace)
+    time.sleep(1)
+    for wd in mail:
+        keyboard.press(wd)
+        time.sleep(0.1)
+        keyboard.release(wd)
+    
+    left_click(1050, 480)
+    left_click(1050, 480)
+    left_click(1050, 480)
+    right_click(1050, 480)
+    right_click(1050, 480)
+    time.sleep(1)
+    left_click(1050, 600)
+    left_click(1050, 600)
+    left_click(1050, 600)
+    left_click(1050, 600)
+    # keyboard.press('a')
+    # pyautogui.keyDown('a')
+    # pyautogui.keyUp('alt')
+    # pyautogui.keyDown('delete')
+    # time.sleep(3)  # 可选，等待一段时间
+    # pyautogui.keyUp('delete')
+
+def chose_clear_reput_pwd_line(pwd):
+    # (left, top, right, bottom) = enter_BATTLE()
+    left_click(1050, 600)
+    from pynput.keyboard import Controller, Key
+    keyboard = Controller()
+    time.sleep(0.5)
+    i = 0
+    while (i < 30):
+        i += 1
+        keyboard.press(Key.backspace)
+        time.sleep(0.1)
+        keyboard.release(Key.backspace)
+    time.sleep(1)
+    for wd in pwd:
+        keyboard.press(wd)
+        time.sleep(0.1)
+        keyboard.release(wd)
+    
+    keyboard.press(Key.enter)
+
+def log_in(mail, passwod):
+    chose_clear_reput_mail_line(mail)
+    time.sleep(2)
+    chose_clear_reput_pwd_line(passwod)
+    time.sleep(10)
+
+def clear_first_log_info_game():
+    (left, top, right, bottom) = enter_BATTLE()
+    left_click(left + 1140, top + 380)
+    time.sleep(1)
+    left_click(left + 1140, top + 80)
+    time.sleep(1)
+
+def enter_game():
+    (left, top, right, bottom) = enter_BATTLE()
+    # click_zuixindongtaicancel()
+    left_click(left + 120, top + 100)
+    time.sleep(1)
+    enter_HS()
+
+def delete_directory_contents(directory):
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for file in files:
+            file_path = os.path.join(root, file)
+            os.remove(file_path)
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            os.rmdir(dir_path)
+
+# def do_single_add_newcard_back_main_tofight():
+#     goto_fight_single_hunter_from_main()
+#     time.sleep(2)
+def delete_smaller_subdirectories(directory_path):
+    # 获取子目录列表
+    subdirectories = os.listdir(directory_path)
+
+    # 将路径转换为绝对路径
+    directory_path = os.path.abspath(directory_path)
+
+    # 按字符顺序对子目录进行排序
+    subdirectories.sort()
+
+    # 删除小的子目录（包括子目录中的所有文件）
+    for subdirectory in subdirectories[:-1]:
+        subdirectory_path = os.path.join(directory_path, subdirectory)
+        if os.path.isdir(subdirectory_path):
+            delete_directory_contents(subdirectory_path)
+            os.rmdir(subdirectory_path)
+
+    # 返回最大子目录的绝对路径
+    return os.path.join(directory_path, subdirectories[-1])
+
+
 if __name__ == "__main__":
-    test_single_chose_hero_x_click(9)
+    
+    # enter_game()
+    # clear_first_log_info_enter_game()
+    goto_fight_single_hunter_from_main()
+    # print(delete_smaller_subdirectories(r"C:\Program Files (x86)\Apps\Hearthstone\Logs"))
+    # test_single_chose_hero_x_click(9)
     # test_CHOSE_OPPO_x_x_click(5, 5)
     # time.sleep(1)
     # test_CHOSE_OWN_x_x_click(7, 7)

@@ -129,7 +129,7 @@ class StrategyState:
         debug_print(f"水晶: {self.my_last_mana}/{self.my_total_mana}")
         debug_print(f"我有{self.my_hand_card_num}张手牌:")
         for hand_card in self.my_hand_cards:
-            debug_print(f"    [{hand_card.zone_pos}] {hand_card.name} "
+            debug_print(f"    [{hand_card.zone_pos}] {hand_card.name} {hand_card.card_id}"
                         f"cost:{hand_card.current_cost}")
         debug_print(f"我的墓地:")
         debug_print("    " + ", ".join([entity.name for entity in self.my_graveyard]))
@@ -399,7 +399,7 @@ class StrategyState:
         for my_index, my_minion in enumerate(self.my_minions):
             if not my_minion.can_attack_minion:
                 continue
-
+            print("can attack is================================================================= ", my_minion.name)
             # 如果没有墙,自己又能打脸,应该试一试
             if not has_taunt \
                     and my_minion.can_beat_face \
@@ -512,6 +512,7 @@ class StrategyState:
                 continue
 
             detail_card = hand_card.detail_card
+            print("now card name is ", hand_card.name, " id is : ", hand_card.card_id)
             if detail_card is None:
                 if hand_card.cardtype == CARD_MINION and not hand_card.battlecry:
                     delta_h, *args = MinionNoPoint.best_h_and_arg(self, hand_card_index)

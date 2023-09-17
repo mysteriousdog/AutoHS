@@ -10,7 +10,7 @@ from strategy import StrategyState
 from log_state import *
 import threading
 import strategy
-import predict_model
+# import predict_model
 FSM_state = ""
 time_begin = 0.0
 game_count = 0
@@ -21,6 +21,11 @@ log_iter = log_iter_func(HEARTHSTONE_POWER_LOG_PATH)
 choose_hero_count = 0
 data_x = []
 data_y = []
+g_is_single = 0
+passwd_list = []
+passwd_index = 0
+my_user = ''
+my_passwd = ''
 
 
 def dump_data_x(data_x):
@@ -57,6 +62,84 @@ def input_thread_func():
         print("user_input is :", strategy.user_input)
 
 
+import os
+
+def delete_directory_contents(directory):
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for file in files:
+            file_path = os.path.join(root, file)
+            os.remove(file_path)
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            os.rmdir(dir_path)
+
+def get_first_subdirectory(path):
+    for item in os.listdir(path):
+        item_path = os.path.join(path, item)
+        if os.path.isdir(item_path):
+            return os.path.abspath(item_path)
+
+
+def delete_directory_contents(directory):
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for file in files:
+            file_path = os.path.join(root, file)
+            os.remove(file_path)
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            os.rmdir(dir_path)
+
+# def do_single_add_newcard_back_main_tofight():
+#     goto_fight_single_hunter_from_main()
+#     time.sleep(2)
+def delete_smaller_subdirectories(directory_path):
+    # 获取子目录列表
+    subdirectories = os.listdir(directory_path)
+
+    # 将路径转换为绝对路径
+    directory_path = os.path.abspath(directory_path)
+
+    # 按字符顺序对子目录进行排序
+    subdirectories.sort()
+
+    # 删除小的子目录（包括子目录中的所有文件）
+    for subdirectory in subdirectories[:-1]:
+        subdirectory_path = os.path.join(directory_path, subdirectory)
+        if os.path.isdir(subdirectory_path):
+            delete_directory_contents(subdirectory_path)
+            os.rmdir(subdirectory_path)
+
+    # 返回最大子目录的绝对路径
+    return os.path.join(directory_path, subdirectories[-1])
+
+
+def read_passwd_file(file_path):
+    global passwd_list, passwd_index
+    with open(file_path, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+        for line in lines:
+           temp = line.split()
+           passwd_list.append(temp)
+    print(passwd_list)
+    passwd_index = 0
+
+def define_my_name():
+    global MY_NAME, passwd_index, passwd_list, my_user, my_passwd
+    MY_NAME= passwd_list[passwd_index][2]
+    my_user = passwd_list[passwd_index][0]
+    my_passwd = passwd_list[passwd_index][1]
+    print("MY_NAME is : ", MY_NAME)
+    print("MY_USER is : ", my_user)
+    print("MY_PASSWD is : ", my_passwd)
+    passwd_index += 1
+
+def enter_battle_from_login():
+    global MY_NAME, passwd_index, passwd_list, my_user, my_passwd
+    define_my_name()
+    from zlh.zlh_click import log_in
+    log_in(my_user, my_passwd)
+
+
 def init():
     global log_state, log_iter, choose_hero_count
 
@@ -68,9 +151,14 @@ def init():
     # 这里是试图在每次初始化文件句柄的时候删除已有的炉石日志. 如果要清空的
     # 日志是关于当前打开的炉石的, 那么炉石会持有此文件的写锁, 使脚本无法
     # 清空日志. 这使得脚本不会清空有意义的日志
-    if os.path.exists(HEARTHSTONE_POWER_LOG_PATH):
+    # read_passwd_file(r'value.txt')
+    print(HEARTHSTONE_POWER_LOG_PATH)
+    log_path = delete_smaller_subdirectories(r"C:\Program Files (x86)\Apps\Hearthstone\Logs")
+    log_path += r"\Power.log"
+    print(log_path)
+    if os.path.exists(log_path):
         try:
-            file_handle = open(HEARTHSTONE_POWER_LOG_PATH, "w")
+            file_handle = open(log_path, "w")
             file_handle.seek(0)
             file_handle.truncate()
             info_print("Success to truncate Power.log")
@@ -80,10 +168,10 @@ def init():
         info_print("Power.log does not exist")
 
     log_state = LogState()
-    log_iter = log_iter_func(HEARTHSTONE_POWER_LOG_PATH)
+    log_iter = log_iter_func(log_path)
     choose_hero_count = 0
-    input_thread = threading.Thread(target=input_thread_func)
-    input_thread.start()
+    # input_thread = threading.Thread(target=input_thread_func)
+    # input_thread.start()
 
 def update_log_state():
     log_container = next(log_iter)
@@ -200,7 +288,8 @@ def ChoosingCardAction():
     time.sleep(21)
     loop_count = 0
     has_print = 0
-
+    init()
+    time.sleep(5)
     while True:
         ok = update_log_state()
 
@@ -217,7 +306,7 @@ def ChoosingCardAction():
         strategy_state = StrategyState(log_state)
         strategy_state.debug_print_out()
         time.sleep(3)
-        return FSM_BATTLING
+        # return FSM_BATTLING
 
         hand_card_num = strategy_state.my_hand_card_num
 
@@ -258,15 +347,18 @@ def Battling():
     global log_state
 
     print_out()
-    print("===========================in Battling===========================")
+    
     not_mine_count = 0
     mine_count = 0
     last_controller_is_me = False
-
+    global g_is_single
+    print("===========================in Battling===========================, g_is_single is :", g_is_single)
     while True:
         if quitting_flag:
             sys.exit(0)
-
+        # if (g_is_single == 1) or (g_is_single == 2):
+        #     time.sleep(30)
+        # time.sleep(2)
         ok = update_log_state()
         if not ok:
             print("===========================update_log_state err in Battling===========================")
@@ -279,74 +371,88 @@ def Battling():
             else:
                 info_print("你输了")
             return FSM_QUITTING_BATTLE
-        strategy_state = StrategyState(log_state)
-        input_info = strategy_state.debug_print_out()
-        print("input_info is :", input_info)
-        if len(input_info[-1]) != 3:
-            predict_input_info = predict_model.predict_action(input_info)
-            print("predict_input_info is :", predict_input_info)
-        time.sleep(1)
+        # strategy_state = StrategyState(log_state)
+        # input_info = strategy_state.debug_print_out()
+        # print("input_info is :", input_info)
+        # if len(input_info[-1]) != 3:
+        #     predict_input_info = predict_model.predict_action(input_info)
+        #     print("predict_input_info is :", predict_input_info)
+        
         # return FSM_BATTLING
         # if len(input_info) == 3:
-        if len(input_info) >= 2 and len(input_info[-1]) == 3:
-            # print("action from user_input: ", input_info)
-            get_index = input_info[-1][0]
-            put_index = input_info[-1][1]
-            point_index = input_info[-1][2]
-            if get_index == -1:
-                click.end_turn()
-                data_x.append(input_info[:-1])
-                data_y.append(input_info[-1])
-                dump_data_x(data_x)
-                dump_data_y(data_y)
-                return FSM_BATTLING
-            if get_index <= (strategy_state.my_hand_card_num) and get_index >= 1:
-                print(1)
-                # strategy_state.use_best_entity(get_index, [1, put_index, point_index])
-                click.choose_card(get_index - 1, strategy_state.my_hand_card_num)
-                if isinstance(strategy_state.my_hand_cards[get_index -1], StrategyMinion) and put_index >= 1 and put_index <= 7:
-                    click.put_minion(put_index - 1, strategy_state.my_minion_num)
-                if point_index == 0 and isinstance(strategy_state.my_hand_cards[get_index -1], StrategySpell):
-                    click.choose_my_minion(0, 1);
-            elif get_index == 0:
-                # zlh.test_battle_hero_power_click()
-                hero_power = strategy_state.my_detail_hero_power
-                hero_power.use_with_arg(strategy_state, -1, [])
-            else:
-                click.choose_my_minion(get_index - strategy_state.my_hand_card_num - 1, strategy_state.my_minion_num)
+        # if len(input_info) >= 2 and len(input_info[-1]) == 3:
+        #     # print("action from user_input: ", input_info)
+        #     get_index = input_info[-1][0]
+        #     put_index = input_info[-1][1]
+        #     point_index = input_info[-1][2]
+        #     if get_index == -1:
+        #         click.end_turn()
+        #         data_x.append(input_info[:-1])
+        #         data_y.append(input_info[-1])
+        #         dump_data_x(data_x)
+        #         dump_data_y(data_y)
+        #         return FSM_BATTLING
+        #     if get_index <= (strategy_state.my_hand_card_num) and get_index >= 1:
+        #         print(1)
+        #         # strategy_state.use_best_entity(get_index, [1, put_index, point_index])
+        #         click.choose_card(get_index - 1, strategy_state.my_hand_card_num)
+        #         if isinstance(strategy_state.my_hand_cards[get_index -1], StrategyMinion) and put_index >= 1 and put_index <= 7:
+        #             click.put_minion(put_index - 1, strategy_state.my_minion_num)
+        #         if point_index == 0 and isinstance(strategy_state.my_hand_cards[get_index -1], StrategySpell):
+        #             click.choose_my_minion(0, 1);
+        #     elif get_index == 0:
+        #         # zlh.test_battle_hero_power_click()
+        #         hero_power = strategy_state.my_detail_hero_power
+        #         hero_power.use_with_arg(strategy_state, -1, [])
+        #     else:
+        #         click.choose_my_minion(get_index - strategy_state.my_hand_card_num - 1, strategy_state.my_minion_num)
             
-            if point_index >= 1 and point_index <= 7:
-                    click.choose_opponent_minion(point_index - 1, strategy_state.oppo_minion_num)
-            elif point_index == 8:
+        #     if point_index >= 1 and point_index <= 7:
+        #             click.choose_opponent_minion(point_index - 1, strategy_state.oppo_minion_num)
+        #     elif point_index == 8:
             
-                click.choose_oppo_hero()
-            # TODO mk func choose card to put && point
-            data_x.append(input_info[:-1])
-            data_y.append(input_info[-1])
-            dump_data_x(data_x)
-            dump_data_y(data_y)
-            # with open('data_x.txt', 'w') as file:
-            #     json.dump(data_x, file)
-            # with open('data_y.txt', 'w') as file:
-            #     json.dump(data_y, file)
-        return FSM_BATTLING
+        #         click.choose_oppo_hero()
+        #     # TODO mk func choose card to put && point
+        #     data_x.append(input_info[:-1])
+        #     data_y.append(input_info[-1])
+        #     dump_data_x(data_x)
+        #     dump_data_y(data_y)
+        #     # with open('data_x.txt', 'w') as file:
+        #     #     json.dump(data_x, file)
+        #     # with open('data_y.txt', 'w') as file:
+        #     #     json.dump(data_y, file)
+        # return FSM_BATTLING
         # 在对方回合等就行了
         if not log_state.is_my_turn:
+            print("========================not my turn=========================")
+            
             last_controller_is_me = False
             mine_count = 0
-
             not_mine_count += 1
             if not_mine_count >= 400:
                 warn_print("Time out in Opponent's turn")
                 return FSM_ERROR
-
+            time.sleep(15)
             continue
 
         # 接下来考虑在我的回合的出牌逻辑
-
+        print("========================start sleep=========================")
+        time.sleep(3)
+        print("========================end sleep=========================")
+        # if (g_is_single == 1) or (g_is_single == 2):
+        #     time.sleep(5)
+        #     update_log_state()
         # 如果是这个我的回合的第一次操作
+        update_log_state()
+        if log_state.is_end:
+            if log_state.my_entity.query_tag("PLAYSTATE") == "WON":
+                win_count += 1
+                info_print("你赢得了这场对战")
+            else:
+                info_print("你输了")
+            return FSM_QUITTING_BATTLE
         if not last_controller_is_me:
-            time.sleep(4)
+            time.sleep(2)
             # 在游戏的第一个我的回合, 发一个你好
             # game_num_turns_in_play在每一个回合开始时都会加一, 即
             # 后手放第一个回合这个数是2
@@ -370,6 +476,9 @@ def Battling():
             time.sleep(STATE_CHECK_INTERVAL)
 
         debug_print("-" * 60)
+        ok = update_log_state()
+        ok = update_log_state()
+        ok = update_log_state()
         strategy_state = StrategyState(log_state)
         strategy_state.debug_print_out()
 
@@ -388,23 +497,77 @@ def Battling():
         if my_index != -2:
             strategy_state.my_entity_attack_oppo(my_index, oppo_index)
         else:
-            click.end_turn()
-            time.sleep(STATE_CHECK_INTERVAL)
+            print("======================================================================================================================================================")
+            time.sleep(1)
+            update_log_state()
+            strategy_state = StrategyState(log_state)
+            index, args = strategy_state.best_h_index_arg()
+            my_index, oppo_index = strategy_state.get_best_attack_target()
+            if index == -2:
+                click.end_turn()
+                time.sleep(STATE_CHECK_INTERVAL)
+            else:
+                continue
+            # else:
+            #     click.end_turn()
+            #     time.sleep(STATE_CHECK_INTERVAL)
 
 
 def QuittingBattle():
     print_out()
-    print("==========================in QuittingBattle==========================")
+    global g_is_single
+    print("==========================in QuittingBattle==========================, g_is_single is", g_is_single)
     time.sleep(5)
-
+    
     loop_count = 0
-    return FSM_CHOOSING_CARD
+    # return FSM_CHOOSING_CARD
     while True:
         if quitting_flag:
             sys.exit(0)
 
         state = get_screen.get_state()
+        if g_is_single == 1:
+            g_is_single += 1
+            click.cancel_click()
+            click.test_click()
+            click.commit_error_report()
+            import zlh.zlh_click
+            time.sleep(5)
+            zlh.zlh_click.test_single_game_start_click()
+            print("11111111111111111111111111111111111111111111111111")
+            time.sleep(1)
+            zlh.zlh_click.test_single_chose_hero_oppo_x_click(3)
+            time.sleep(1)
+            zlh.zlh_click.test_single_chose_hero_oppo_x_click(3)
+            time.sleep(1)
+            zlh.zlh_click.test_single_chose_hero_oppo_x_click(3)
+            time.sleep(1)
+            zlh.zlh_click.test_single_chose_hero_oppo_x_click(3)
+            print("222222222222222222222222222222222222222222222222222")
+            time.sleep(1)
+            zlh.zlh_click.test_single_game_start_click()
+            print("333333333333333333333333333333333333333333333333333")
+            time.sleep(3)
+            return FSM_MATCHING
+        elif g_is_single == 2:
+            print("44444444444444444444444444444444444444444444444444444444444444")
+            time.sleep(3)
+            click.cancel_click()
+            click.test_click()
+            click.test_click()
+            click.test_click()
+            click.test_click()
+            click.test_click()
+            click.test_click()
+            time.sleep(1)
+            click.commit_error_report()
+            import zlh.zlh_click
+            zlh.zlh_click.add_new_hunter_cards_from_single()
+            g_is_single = False
+            return FSM_MAIN_MENU
+        print("55555555555555555555555555555555555555555555555555555555")
         if state in [FSM_CHOOSING_HERO, FSM_LEAVE_HS]:
+            print("66666666666666666666666666666666666666666666666666")
             return state
         click.cancel_click()
         click.test_click()
@@ -508,20 +671,27 @@ def FSM_dispatch(next_state):
         return dispatch_dict[next_state]()
 
 
-def AutoHS_automata():
-    global FSM_state
 
+def AutoHS_automata(is_single=0):
+    global FSM_state
+    global g_is_single
+    g_is_single = is_single
+    # init()
     if get_screen.test_hs_available():
         hs_hwnd = get_screen.get_HS_hwnd()
         get_screen.move_window_foreground(hs_hwnd)
         time.sleep(0.5)
     # FSM_state = FSM_CHOOSING_CARD
-    read_data_x()
-    read_data_y()
+    # read_data_x()
+    # read_data_y()
     while 1:
         if quitting_flag:
             sys.exit(0)
         if FSM_state == "":
+            if g_is_single == 1 or g_is_single == 2:
+                time.sleep(15)
+            else:
+                time.sleep(10)
             FSM_state = get_screen.get_state()
         FSM_state = FSM_dispatch(FSM_state)
 
