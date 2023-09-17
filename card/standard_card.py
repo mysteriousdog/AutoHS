@@ -1,5 +1,6 @@
 from card.basic_card import *
 import statistics
+import copy
 BrandonKitkouski_used_before = 0
 # 护甲商贩
 class ArmorVendor(MinionNoPoint):
@@ -300,6 +301,20 @@ class ArcaneShot(SpellPointOppo):
 
         return best_delta_h, best_oppo_index
 
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        del state.my_minions[index]
+        oppo_index = action.point_oppo
+        if oppo_index == -1:
+            state.oppo_hero.get_damaged(2)
+            return state.oppo_hero.delta_h_after_damage(2), [state]
+        
+        if state.oppo_minions[oppo_index].get_damaged(2):
+            del state.oppo_minions[oppo_index]
+        return state.oppo_hero.delta_h_after_damage(2), [state]
+
 #惩罚 -水晶（1：1） - 卡牌（1：1） - 被动（0.5）
 
 #奖励 +过牌（1：1） + 冷冻（1：1）
@@ -324,6 +339,12 @@ class BrandonKitkouski(SpellNoPoint):
             return -99999999,
         return cls.bias + sum([minion.delta_h_after_damage(2)
                                for minion in state.oppo_minions]) + state.oppo_hero.delta_h_after_damage(2),
+    
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        del state.my_minions[index]
+        return cls.best_h_and_arg(state, 0), [state]
 
 #快速射击
 class QuickShot(SpellPointOppo):
@@ -349,6 +370,20 @@ class QuickShot(SpellPointOppo):
                 best_oppo_index = oppo_index
 
         return best_delta_h, best_oppo_index
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        del state.my_minions[index]
+        oppo_index = action.point_oppo
+        if oppo_index == -1:
+            state.oppo_hero.get_damaged(3)
+            return state.oppo_hero.delta_h_after_damage(3), [state]
+        
+        if state.oppo_minions[oppo_index].get_damaged(3):
+            del state.oppo_minions[oppo_index]
+        return state.oppo_hero.delta_h_after_damage(3), [state]
+
    
 # 致命射击
 class DeadlyShot(SpellNoPoint):
@@ -361,6 +396,21 @@ class DeadlyShot(SpellNoPoint):
         return cls.bias + statistics.mean([minion.heuristic_val
                                for minion in state.oppo_minions]),
 
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        del state.my_minions[index]
+        states = []
+        values = []
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            statex = copy.deepcopy(state)
+            val = statex.oppo_minions[oppo_index].heuristic_val
+            del statex.oppo_minions[oppo_index]
+            values.append(val)
+            states.append(statex)
+        return values, states
+
+
 # 动物伙伴
 class AnimalCompanion(SpellNoPoint):
     bias = -4
@@ -368,15 +418,37 @@ class AnimalCompanion(SpellNoPoint):
     def best_h_and_arg(cls, state, hand_card_index):
         return cls.bias + (10 + 9 + 7) / 3,
 
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        del state.my_minions[index]
+        states = []
+        values = [6, 5, 3]
+        s1 = StrategyMinion(attack = 4, taunt = 1, max_healt = 4)
+        return values, states
+
 # 狼人渗透者
 class WorgenInfiltrator(MinionNoPoint):
-    value = 3
+    value = 3 - 2
     keep_in_hand_bool = True
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        # if action.is_in_hand:
+        #     index = action.hand_index
+        #     state.oppo_minions.append(state.my_minions[index])
+        #     del state.my_minions[index]
+        #     return cls.value
+        if action.is_in_hand:
+            return cls.delta_h_after_direct_hand_no_point(cls, action, state), [state]
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls(cls, action, state), [state]
+
 
 # 冰川裂片
 class GlacialShard(MinionPointOppo):
     keep_in_hand_bool = True
-    value = 3
+    value = 3 - 2
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
         best_h = cls.value + state.oppo_hero.heuristic_val / 10
@@ -393,9 +465,23 @@ class GlacialShard(MinionPointOppo):
 
         return best_h, state.my_minion_num, best_oppo_index
 
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            index = action.hand_index
+            state.oppo_minions.append(state.my_minions[index])
+            del state.my_minions[index]
+            if action.point_oppo == -1:
+                return cls.value + state.oppo_hero.heuristic_val / 10
+            return (cls.value + state.oppo_minions[action.point_oppo].heuristic_val / 2), [state]
+        
+        if action.is_in_battle:
+            if action.is_in_battle:
+                return cls.delta_h_after_direct_cls(cls, action, state), [state]
+
 # 吸血蚊
 class LifeDrinker(MinionNoPoint):
-    value = 6
+    value = 6 - 5
     keep_in_hand_bool = False
 
     @classmethod
@@ -412,10 +498,20 @@ class LifeDrinker(MinionNoPoint):
             cls.value += 1
         return cls.value, state.my_minion_num
 
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return (cls.delta_h_after_direct_hand_no_point(cls, action, state) + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls(cls, action, state), [state]
+
+
 # 恐狼前锋
 class DireWolfAlpha(MinionNoPoint):
     keep_in_hand_bool = True
-    value = 4
+    value = 4 - 3
 
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
@@ -425,20 +521,36 @@ class DireWolfAlpha(MinionNoPoint):
             cls.value += 2
         return cls.value, state.my_minion_num - 1
 
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0], [state]
+
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls(cls, action, state)
+
 # 战利品贮藏者
 class LootHoarder(MinionNoPoint):
     keep_in_hand_bool = True
-    value = 3
+    value = 3 - 3
 
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
         cls.value += (10 - state.my_hand_card_num) / 2
         return cls.value, state.my_minion_num
 
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0] / 2), [state]
+
+        if action.is_in_battle:
+            return (cls.delta_h_after_direct_cls(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0] / 2), [state]
+
 # 精灵龙
 class FaerieDragon(MinionNoPoint):
     keep_in_hand_bool = True
-    value = 5
+    value = 5 - 3
 
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
@@ -446,10 +558,18 @@ class FaerieDragon(MinionNoPoint):
             cls.value += 1
         return cls.value, state.my_minion_num
 
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls(cls, action, state)
+
 # 异教低阶牧师
 class CultNeophyte(MinionNoPoint):
     keep_in_hand_bool = True
-    value = 5
+    value = 5 - 3
 
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
@@ -458,15 +578,32 @@ class CultNeophyte(MinionNoPoint):
         if state.oppo_hero_power.name == "火球术" or state.oppo_hero_power.name == "次级治疗术" or state.oppo_hero_power.name == "生命分流":
             cls.value += 0.5
         return cls.value, state.my_minion_num
+    
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls(cls, action, state)
 
 # 碧蓝幼龙
 class BlueDrogen(MinionNoPoint):
-    value = 10
+    value = 10 - 6
+    keep_in_hand_bool = False
 
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
         cls.value += (10 - state.my_hand_card_num) / 2
         return cls.value, state.my_minion_num
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls(cls, action, state)
     
 
 

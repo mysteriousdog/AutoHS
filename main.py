@@ -6,6 +6,9 @@ from FSM_action import init
 from FSM_action import enter_battle_from_login
 from FSM_action import read_passwd_file
 from click import enter_HS_step_2
+
+
+
 if __name__ == "__main__":
     # check_name()
     print_info_init()

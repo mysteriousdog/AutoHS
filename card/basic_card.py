@@ -139,6 +139,28 @@ class MinionCard(Card):
         delta_h += cls.basic_delta_h(state, hand_card_index)
         delta_h += cls.combo_delta_h(state, hand_card_index)
         return (delta_h,) + tuple(args)
+    
+    @classmethod
+    def delta_h_after_direct_cls(cls, action, state):
+        if action.is_in_battle:
+            oppo_minion = state.oppo_minions[action.point_oppo]
+            oppo_atk = oppo_minion.attack
+            me = state.my_minions[action.battle_index]
+            val_add = oppo_minion.delta_h_after_damage(action.cost_damage)
+            val_del = me.delta_h_after_damage(action.cost_damage)
+            if oppo_minion.get_damaged(action.cost_damage):
+                del state.oppo_minions[action.point_oppo]
+            if me.get_damaged(oppo_atk):
+                del state.my_minions[action.battle_index]
+            return (val_add - val_del) , [state]
+
+    @classmethod
+    def delta_h_after_direct_hand_no_point(cls, action, state):
+        if action.is_in_hand:
+            index = action.hand_index
+            state.oppo_minions.append(state.my_minions[index])
+            del state.my_minions[index]
+            return cls.value, [state]
 
 
 class MinionNoPoint(MinionCard):

@@ -342,6 +342,29 @@ def ChoosingCardAction():
         time.sleep(STATE_CHECK_INTERVAL)
 
 
+
+def get_best_solution(strategy_state, action_list):
+    max_val = 0
+    best_action = 0
+    temp_val = 0
+    temp_action = 0
+
+    for actions in action_list:
+        temp_val = 0
+        temp_action = 0
+        for action in actions:
+            temp_state = copy.deepcopy(strategy_state)
+            temp_val = action.do_action(temp_state)
+            temp_action_list = temp_state.get_action_list()
+            temp_val1, _ = get_best_solution(temp_state, temp_action_list)
+            temp_val += temp_val1
+            if temp_val > max_val:
+                max_val = temp_val
+                best_action = action
+    
+    return max_val, best_action
+
+
 def Battling():
     global win_count
     global log_state
