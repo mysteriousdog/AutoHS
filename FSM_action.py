@@ -152,15 +152,16 @@ def init():
     # 日志是关于当前打开的炉石的, 那么炉石会持有此文件的写锁, 使脚本无法
     # 清空日志. 这使得脚本不会清空有意义的日志
     # read_passwd_file(r'value.txt')
-    print(HEARTHSTONE_POWER_LOG_PATH)
-    log_path = delete_smaller_subdirectories(r"C:\Program Files (x86)\Apps\Hearthstone\Logs")
-    log_path += r"\Power.log"
-    print(log_path)
+    # print(HEARTHSTONE_POWER_LOG_PATH)
+    # log_path = delete_smaller_subdirectories(r"C:\Program Files (x86)\Apps\Hearthstone\Logs")
+    # log_path += r"\Power.log"
+    # print(log_path)
+    log_path = r"Power.log"
     if os.path.exists(log_path):
         try:
-            file_handle = open(log_path, "w")
-            file_handle.seek(0)
-            file_handle.truncate()
+            file_handle = open(log_path, "r")
+            # file_handle.seek(0)
+            # file_handle.truncate()
             info_print("Success to truncate Power.log")
         except OSError:
             warn_print("Fail to truncate Power.log, maybe someone is using it")
@@ -342,28 +343,50 @@ def ChoosingCardAction():
         time.sleep(STATE_CHECK_INTERVAL)
 
 
-
 def get_best_solution(strategy_state, action_list):
     max_val = 0
     best_action = 0
     temp_val = 0
     temp_action = 0
-
+    
+    print("in get_best_solution action_list len is ", len(action_list))
     for actions in action_list:
         temp_val = 0
-        temp_action = 0
         for action in actions:
+            print("in get_best_solution actions len is ", len(actions))
+            action.show_action()
             temp_state = copy.deepcopy(strategy_state)
-            temp_val = action.do_action(temp_state)
-            temp_action_list = temp_state.get_action_list()
-            temp_val1, _ = get_best_solution(temp_state, temp_action_list)
-            temp_val += temp_val1
-            if temp_val > max_val:
-                max_val = temp_val
-                best_action = action
+            temp_val, states = action.do_action(temp_state)
+            if len(states) == 0:
+                continue
+            for state in states:  
+                print("in get_best_solution states len is ", len(states))  
+                temp_action_list = state.get_action_list()
+                temp_val1, _ = get_best_solution(state, temp_action_list)
+                temp_val += temp_val1
+                if temp_val > max_val:
+                    max_val = temp_val
+                    best_action = action
+                temp_val -= temp_val1
     
     return max_val, best_action
 
+
+def test_battle():
+    global log_state
+    check_name()
+    init()
+    update_log_state()
+    strategy_state = StrategyState(log_state)
+    input_info = strategy_state.debug_print_out()
+    action_list = strategy_state.get_action_list()
+    print(action_list)
+    # for actions in action_list:
+    #     if not actions:
+    #         continue
+    #     for action in actions:
+    #         action.show_action()
+    max_val, best_action = get_best_solution(strategy_state, action_list)
 
 def Battling():
     global win_count
@@ -693,8 +716,6 @@ def FSM_dispatch(next_state):
     else:
         return dispatch_dict[next_state]()
 
-
-
 def AutoHS_automata(is_single=0):
     global FSM_state
     global g_is_single
@@ -719,7 +740,5 @@ def AutoHS_automata(is_single=0):
         FSM_state = FSM_dispatch(FSM_state)
 
 
-# if __name__ == "__main__":
-#     keyboard.add_hotkey("ctrl+q", system_exit)
-
-#     init()
+if __name__ == "__main__":
+    test_battle()
