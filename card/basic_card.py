@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import click
 from constants.constants import *
 from print_info import *
-
+import strategy
 
 class Card(ABC):
     # 用来指示是否在留牌阶段把它留下, 默认留下
@@ -54,6 +54,18 @@ class SpellNoPoint(SpellCard):
         click.choose_and_use_spell(card_index, state.my_hand_card_num)
         click.cancel_click()
         time.sleep(cls.wait_time)
+    
+    @classmethod
+    def get_all_actions_nopoint_cls(cls, state, index, is_in_hand, cost):
+        actions = []
+        if not is_in_hand:
+            return actions
+        if state.my_last_mana < cost:
+            return actions
+        action = strategy.Action()
+        action.set_use_nopoint_spell(state, index)
+        actions.append(action)
+        return actions
 
 
 class SpellPointOppo(SpellCard):
@@ -158,9 +170,33 @@ class MinionCard(Card):
     def delta_h_after_direct_hand_no_point(cls, action, state):
         if action.is_in_hand:
             index = action.hand_index
-            state.oppo_minions.append(state.my_minions[index])
-            del state.my_minions[index]
+            state.oppo_minions.append(state.my_hand_cards[index])
+            state.pay_mana(state.my_hand_cards[index].current_cost)
+            del state.my_hand_cards[index]
             return cls.value, [state]
+    
+    @classmethod
+    def get_all_actions_MinionNoPoint_inbattle(cls, state, index, is_in_hand):
+        actions = []
+        if is_in_hand:
+            return actions
+        touchable_oppo_minions = state.touchable_oppo_minions
+        has_taunt = state.oppo_has_taunt
+        my_minion = state.my_minions[index]
+        if not has_taunt \
+                and my_minion.can_beat_face \
+                and state.oppo_hero.can_be_pointed_by_minion:
+            action = strategy.Action()
+            action.set_minion_atk_hero(state, index, my_minion.attack)
+            actions.append(action)
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if oppo_minion not in touchable_oppo_minions:
+                continue
+            if oppo_minion.can_be_pointed_by_minion:
+                action = strategy.Action()
+                action.set_hero_atk_minion(state, oppo_index)
+                actions.append(action)
+        return actions
 
 
 class MinionNoPoint(MinionCard):
@@ -171,7 +207,22 @@ class MinionNoPoint(MinionCard):
         click.put_minion(gap_index, state.my_minion_num)
         click.cancel_click()
         time.sleep(BASIC_MINION_PUT_INTERVAL)
-
+        
+    @classmethod
+    def get_all_actions_MinionNoPoint_inhand(cls, state, index, is_in_hand):
+        actions = []
+        if not is_in_hand:
+            return actions
+        cost = state.my_hand_cards[index].current_cost
+        if state.my_last_mana < cost:
+            return actions
+        
+        state.pay_mana(cost)
+        action = strategy.Action()
+        action.set_minion_put_nopoint(state, index, state.my_minion_num)
+        actions.append(action)
+        return actions
+        
 
 class MinionPointOppo(MinionCard):
     @classmethod
@@ -257,3 +308,12 @@ class Coin(SpellNoPoint):
             best_delta_h = max(best_delta_h, delta_h)
 
         return best_delta_h,
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 0)
+    
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        state.pay_mana(-1)
+        return 1, [state]
