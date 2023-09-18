@@ -12,63 +12,110 @@ user_input = ""
 
 class Action():
     is_in_hand = False
-    hand_index = -1
+    hand_index = -3
+    put_index = -3
     is_in_battle = False
-    battle_index = -1
-    point_self = -2
-    point_oppo = -2
+    battle_index = -3
+    point_self = -3
+    point_oppo = -3
     cost_damage = 0
     cost_heal = 0
     
+    def show_action(cls):
+        print("=========================================")
+        print("is_in_hand: ", cls.is_in_hand)
+        print("hand_index: ", cls.hand_index)
+        print("put_index: ", cls.put_index)
+        print("is_in_battle: ", cls.is_in_battle)
+        print("battle_index: ", cls.battle_index)
+        print("point_self: ", cls.point_self)
+        print("point_oppo: ", cls.point_oppo)
+        print("cost_damage: ", cls.cost_damage)
+        print("cost_heal: ", cls.cost_heal)
+        print("=========================================")
+        print("")
+    
     def set_in_hand(cls):
-        is_in_hand = True
+        cls.is_in_hand = True
 
     def set_in_battle(cls):
-        is_in_battle = True
+        cls.is_in_battle = True
 
     def set_hero_atk_hero(cls, state):
-        is_in_hand = True
-        hand_index = -1
-        point_oppo = -1
-        cost_damage = state.my_hero.attack
+        cls.is_in_hand = True
+        cls.hand_index = -1
+        cls.point_oppo = -1
+        cls.cost_damage = state.my_hero.attack
 
     def set_hero_atk_minion(cls, state, index):
-        is_in_hand = True
-        hand_index = -1
-        point_oppo = index
-        cost_damage = state.my_hero.attack
+        cls.is_in_hand = True
+        cls.hand_index = -1
+        cls.point_oppo = index
+        cls.cost_damage = state.my_hero.attack
 
 
-    def set_hero_power(self, state, index, damage):
-        is_in_hand = True
-        point_oppo = index
-        cost_damage = damage
+    def set_hero_power(cls, state, index, damage):
+        cls.is_in_hand = True
+        cls.hand_index = -2
+        cls.point_oppo = index
+        cls.cost_damage = damage
 
-    def set_default_minion(self, state, hand_card_index):
+    def set_default_minion(cls, state, hand_card_index):
         delta_h, *args = MinionNoPoint.best_h_and_arg(state, hand_card_index)
-        is_in_hand = True
-        hand_index = hand_card_index
+        cls.is_in_hand = True
+        cls.hand_index = hand_card_index
 
-    def set_minion_atk_hero(self, state, index, damage):
-        is_in_battle = True
-        battle_index = index
-        point_oppo = -1
-        cost_damage = damage
+    def set_minion_atk_hero(cls, state, index, damage):
+        cls.is_in_battle = True
+        cls.battle_index = index
+        cls.point_oppo = -1
+        cls.cost_damage = damage
 
-    def set_minion_atk_minion(self, state, index, oppo_index, damage):
-        is_in_battle = True
-        battle_index = index
-        point_oppo = oppo_index
-        cost_damage = damage
+    def set_minion_put_nopoint(cls, state, my_index, pt_index):
+        cls.is_in_hand = True
+        cls.hand_index = my_index
+        cls.put_index = pt_index
+
+    def set_spell_atk_hero(cls, state, index, damage):
+        cls.is_in_hand = True
+        cls.hand_index = index
+        cls.point_oppo = -1
+        cls.cost_damage = damage
+        
+    def set_spell_atk_minon(cls, state, my_index, oppo_index, damage):
+        cls.is_in_hand = True
+        cls.hand_index = my_index
+        cls.point_oppo = oppo_index
+        cls.cost_damage = damage
+
+    def set_use_nopoint_spell(cls, state, my_index):
+        cls.is_in_hand = True
+        cls.hand_index = my_index
+
+    def set_minion_atk_minion(cls, state, index, oppo_index, damage):
+        cls.is_in_battle = True
+        cls.battle_index = index
+        cls.point_oppo = oppo_index
+        cls.cost_damage = damage
 
     def do_action(cls, state):
         detail_card = 0
         if cls.is_in_hand:
-            detail_card = state.my_hand_cards[cls.hand_index].detail_card
+            if cls.hand_index == -2:
+                if not state.pay_mana(2):
+                    return 0, []
+                return state.oppo_hero.delta_h_after_damage(2), [state]
+            if cls.hand_index == -1:
+                return 0, []
+            if cls.hand_index >= 0 and cls.hand_index <= 6:
+                if state.my_hand_cards[cls.hand_index].current_cost > state.my_last_mana:
+                    return 0, []
+                detail_card = state.my_hand_cards[cls.hand_index].detail_card
         elif cls.is_in_battle:
             detail_card = state.my_minions[cls.battle_index].detail_card
         if detail_card != 0:
             return detail_card.delta_h_after_direct(cls, state)
+        print("????????????????????????????")
         if cls.point_oppo == -1:
             val = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
             state.oppo_hero.get_damaged(cls.cost_damage)
@@ -162,6 +209,7 @@ class StrategyState:
         res = []
         actions = []
         if self.my_hero.can_attack:
+            print(" my hero can attack!")
             if self.oppo_hero.can_be_pointed_by_minion:
                 action = Action()
                 action.set_hero_atk_hero(self)
@@ -174,6 +222,7 @@ class StrategyState:
             res.append(actions)
         # hero_power
         if not self.my_hero_power.exhausted and self.my_last_mana >= 2:
+            print(" my hero power can attack!")
             actions = []
             action = Action()
             action.set_hero_power(self, -1, 2)
@@ -200,6 +249,7 @@ class StrategyState:
         touchable_oppo_minions = self.touchable_oppo_minions
         has_taunt = self.oppo_has_taunt
         for battle_card_index, battle_card in enumerate(self.my_minions):
+            # print("battle_card_index is :", battle_card_index)
             if not battle_card.can_attack_minion:
                 continue
             actions = []
@@ -214,9 +264,9 @@ class StrategyState:
                 if oppo_min not in touchable_oppo_minions:
                     continue
                 action = Action()
-                action.set_minion_atk_minion(self, oppo_index, battle_card.attack)
+                action.set_minion_atk_minion(self, battle_card_index, oppo_index, battle_card.attack)
                 actions.append(action)
-        res.append(actions)
+            res.append(actions)
         return res
 
 
@@ -401,6 +451,13 @@ class StrategyState:
     @property
     def my_last_mana(self):
         return self.my_total_mana - self.my_used_mana + self.my_temp_mana
+    
+    def pay_mana(self, mana_num):
+        if mana_num + self.my_used_mana - self.my_total_mana > 0:
+            print("err in  pay_mana!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!, mana_num is :", mana_num, "my_used_mana is ", self.my_used_mana, " my_total_mana is :", self.my_total_mana)
+            return False
+        self.my_used_mana += mana_num
+        return True
 
     @property
     def oppo_minion_num(self):
