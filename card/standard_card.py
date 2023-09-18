@@ -1,6 +1,9 @@
+import sys
+sys.path.append(r"..")
 from card.basic_card import *
 import statistics
 import copy
+import strategy
 BrandonKitkouski_used_before = 0
 # 护甲商贩
 class ArmorVendor(MinionNoPoint):
@@ -305,8 +308,9 @@ class ArcaneShot(SpellPointOppo):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        del state.my_minions[index]
+        del state.my_hand_cards[index]
         oppo_index = action.point_oppo
+        state.pay_mana(1)  
         if oppo_index == -1:
             state.oppo_hero.get_damaged(2)
             return state.oppo_hero.delta_h_after_damage(2), [state]
@@ -314,6 +318,26 @@ class ArcaneShot(SpellPointOppo):
         if state.oppo_minions[oppo_index].get_damaged(2):
             del state.oppo_minions[oppo_index]
         return state.oppo_hero.delta_h_after_damage(2), [state]
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        actions = []
+        if not is_in_hand:
+            return actions
+        if state.my_last_mana < 1:
+            return actions
+        if state.oppo_hero.can_be_pointed_by_spell:
+            action = strategy.Action()
+            action.set_spell_atk_hero(state, index, 2)
+            actions.append(action)
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            action = strategy.Action()
+            action.set_spell_atk_minon(state, index, oppo_index, 2)
+            actions.append(action)
+        return actions
+        
 
 #惩罚 -水晶（1：1） - 卡牌（1：1） - 被动（0.5）
 
@@ -344,6 +368,7 @@ class BrandonKitkouski(SpellNoPoint):
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
         del state.my_minions[index]
+        state.pay_mana(2)
         return cls.best_h_and_arg(state, 0), [state]
 
 #快速射击
@@ -376,6 +401,7 @@ class QuickShot(SpellPointOppo):
         index = action.hand_index
         del state.my_minions[index]
         oppo_index = action.point_oppo
+        state.pay_mana(2)
         if oppo_index == -1:
             state.oppo_hero.get_damaged(3)
             return state.oppo_hero.delta_h_after_damage(3), [state]
@@ -383,8 +409,7 @@ class QuickShot(SpellPointOppo):
         if state.oppo_minions[oppo_index].get_damaged(3):
             del state.oppo_minions[oppo_index]
         return state.oppo_hero.delta_h_after_damage(3), [state]
-
-   
+ 
 # 致命射击
 class DeadlyShot(SpellNoPoint):
     bias = -5
@@ -404,6 +429,7 @@ class DeadlyShot(SpellNoPoint):
         values = []
         for oppo_index, oppo_minion in enumerate(state.oppo_minions):
             statex = copy.deepcopy(state)
+            statex.pay_mana(3)
             val = statex.oppo_minions[oppo_index].heuristic_val
             del statex.oppo_minions[oppo_index]
             values.append(val)
@@ -424,8 +450,25 @@ class AnimalCompanion(SpellNoPoint):
         del state.my_minions[index]
         states = []
         values = [6, 5, 3]
-        s1 = StrategyMinion(attack = 4, taunt = 1, max_healt = 4)
+        import strategy_entity
+        s1 = strategy_entity.StrategyMinion(attack = 4, taunt = 1, max_healt = 4)
+        state1 = copy.deepcopy(state)
+        state1.my_minions.append(s1)
+        state1.pay_mana(3)
+        s2 = strategy_entity.StrategyMinion(attack = 4, rush = 1, max_healt = 2)
+        state2 = copy.deepcopy(state)
+        state2.my_minions.append(s2)
+        state2.pay_mana(3)
+        s3 = strategy_entity.StrategyMinion(attack = 2, max_healt = 4)
+        state3 = copy.deepcopy(state)
+        state3.my_minions.append(s3)
+        state3.pay_mana(3)
+        states = [state1 ,state2, state3]
         return values, states
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 3)
 
 # 狼人渗透者
 class WorgenInfiltrator(MinionNoPoint):
@@ -440,9 +483,16 @@ class WorgenInfiltrator(MinionNoPoint):
         #     del state.my_minions[index]
         #     return cls.value
         if action.is_in_hand:
-            return cls.delta_h_after_direct_hand_no_point(cls, action, state), [state]
+            return cls.delta_h_after_direct_hand_no_point( action, state), [state]
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls(cls, action, state), [state]
+            return cls.delta_h_after_direct_cls( action, state), [state]
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 
 # 冰川裂片
@@ -466,18 +516,11 @@ class GlacialShard(MinionPointOppo):
         return best_h, state.my_minion_num, best_oppo_index
 
     @classmethod
-    def delta_h_after_direct(cls, action, state):
-        if action.is_in_hand:
-            index = action.hand_index
-            state.oppo_minions.append(state.my_minions[index])
-            del state.my_minions[index]
-            if action.point_oppo == -1:
-                return cls.value + state.oppo_hero.heuristic_val / 10
-            return (cls.value + state.oppo_minions[action.point_oppo].heuristic_val / 2), [state]
-        
-        if action.is_in_battle:
-            if action.is_in_battle:
-                return cls.delta_h_after_direct_cls(cls, action, state), [state]
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 # 吸血蚊
 class LifeDrinker(MinionNoPoint):
@@ -502,10 +545,18 @@ class LifeDrinker(MinionNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
-            return (cls.delta_h_after_direct_hand_no_point(cls, action, state) + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+            return (cls.delta_h_after_direct_hand_no_point( action, state) + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
 
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls(cls, action, state), [state]
+            return cls.delta_h_after_direct_cls( action, state), [state]
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+        
 
 
 # 恐狼前锋
@@ -524,10 +575,17 @@ class DireWolfAlpha(MinionNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
-            return cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0], [state]
+            return cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0], [state]
 
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls(cls, action, state)
+            return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 # 战利品贮藏者
 class LootHoarder(MinionNoPoint):
@@ -542,10 +600,10 @@ class LootHoarder(MinionNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
-            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0] / 2), [state]
+            return (cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0] / 2), [state]
 
         if action.is_in_battle:
-            return (cls.delta_h_after_direct_cls(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0] / 2), [state]
+            return (cls.delta_h_after_direct_cls( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0] / 2), [state]
 
 # 精灵龙
 class FaerieDragon(MinionNoPoint):
@@ -561,10 +619,10 @@ class FaerieDragon(MinionNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
-            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+            return (cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
 
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls(cls, action, state)
+            return cls.delta_h_after_direct_cls( action, state)
 
 # 异教低阶牧师
 class CultNeophyte(MinionNoPoint):
@@ -582,10 +640,10 @@ class CultNeophyte(MinionNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
-            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+            return (cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
 
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls(cls, action, state)
+            return cls.delta_h_after_direct_cls( action, state)
 
 # 碧蓝幼龙
 class BlueDrogen(MinionNoPoint):
@@ -600,10 +658,10 @@ class BlueDrogen(MinionNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
-            return (cls.delta_h_after_direct_hand_no_point(cls, action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+            return (cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
 
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls(cls, action, state)
+            return cls.delta_h_after_direct_cls( action, state)
     
 
 
