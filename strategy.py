@@ -236,6 +236,7 @@ class StrategyState:
             res.append(actions)
         # hero_power
         # print("!!!!!!!!!!!!!!!!!!!!!!!!!!self.my_hero_power.exhausted is", self.my_hero_power.exhausted)
+        # if self.my_last_mana > 0:
         if not self.my_hero_power.exhausted and self.my_last_mana >= 2:
             # print(" my hero power can attack!")
             actions = []

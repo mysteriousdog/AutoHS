@@ -155,16 +155,19 @@ class MinionCard(Card):
     @classmethod
     def delta_h_after_direct_cls(cls, action, state):
         if action.is_in_battle:
-            me = state.my_minions[action.battle_index]
-            oppo_minion = state.oppo_minions[action.point_oppo]
-            oppo_atk = oppo_minion.attack
-            val_del = me.delta_h_after_damage(oppo_atk)
             if action.point_oppo == -1:
                 oppo_atk = 0
                 oppo_minion = state.oppo_hero
                 val_del = 0
-            val_add = oppo_minion.delta_h_after_damage(action.cost_damage)
-            oppo_minion.get_damaged(action.cost_damage)
+            else:
+                oppo_minion = state.oppo_minions[action.point_oppo]
+                oppo_atk = oppo_minion.attack
+            me = state.my_minions[action.battle_index]
+            if action.point_oppo != -1:
+                val_del = me.delta_h_after_damage(oppo_atk)
+            
+            val_add = oppo_minion.delta_h_after_damage(me.attack)
+            oppo_minion.get_damaged(me.attack)
             me.exhausted = 1
             if oppo_minion.health <= 0:
                 if action.point_oppo == -1:
@@ -174,6 +177,7 @@ class MinionCard(Card):
             if me.get_damaged(oppo_atk):
                 del state.my_minions[action.battle_index]
             val = val_add - val_del
+            print("=============================val_add is ", val_add, " val_del is ", val_del)
             return val , [state]
 
     @classmethod

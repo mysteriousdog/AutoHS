@@ -409,6 +409,26 @@ class QuickShot(SpellPointOppo):
         if state.oppo_minions[oppo_index].get_damaged(3):
             del state.oppo_minions[oppo_index]
         return state.oppo_hero.delta_h_after_damage(3), [state]
+
+
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        actions = []
+        if not is_in_hand:
+            return actions
+        if state.my_last_mana < 1:
+            return actions
+        if state.oppo_hero.can_be_pointed_by_spell:
+            action = strategy.Action()
+            action.set_spell_atk_hero(state, index, 3)
+            actions.append(action)
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            action = strategy.Action()
+            action.set_spell_atk_minon(state, index, oppo_index, 3)
+            actions.append(action)
+        return actions
  
 # 致命射击
 class DeadlyShot(SpellNoPoint):
@@ -505,6 +525,30 @@ class WorgenInfiltrator(MinionNoPoint):
            return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
         else:
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+        
+# 荆棘谷猛虎
+class Tiger(MinionNoPoint):
+    value = 10 - 5 - 1 + 2
+    keep_in_hand_bool = False
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        # if action.is_in_hand:
+        #     index = action.hand_index
+        #     state.oppo_minions.append(state.my_minions[index])
+        #     del state.my_minions[index]
+        #     return cls.value
+        if action.is_in_hand:
+            return cls.delta_h_after_direct_hand_no_point( action, state)
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 
 # 冰川裂片
@@ -526,6 +570,7 @@ class GlacialShard(MinionPointOppo):
                 best_oppo_index = oppo_index
 
         return best_h, state.my_minion_num, best_oppo_index
+
 
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
@@ -616,6 +661,13 @@ class LootHoarder(MinionNoPoint):
 
         if action.is_in_battle:
             return (cls.delta_h_after_direct_cls( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0] / 2), [state]
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 # 精灵龙
 class FaerieDragon(MinionNoPoint):
@@ -635,6 +687,13 @@ class FaerieDragon(MinionNoPoint):
 
         if action.is_in_battle:
             return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 # 异教低阶牧师
 class CultNeophyte(MinionNoPoint):
@@ -656,6 +715,13 @@ class CultNeophyte(MinionNoPoint):
 
         if action.is_in_battle:
             return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 # 碧蓝幼龙
 class BlueDrogen(MinionNoPoint):
@@ -674,6 +740,13 @@ class BlueDrogen(MinionNoPoint):
 
         if action.is_in_battle:
             return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
     
 
 
