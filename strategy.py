@@ -99,12 +99,15 @@ class Action():
         cls.cost_damage = damage
 
     def do_action(cls, state):
-        detail_card = 0
+        detail_card = None
         if cls.is_in_hand:
             if cls.hand_index == -2:
                 if not state.pay_mana(2):
                     return 0, []
-                return state.oppo_hero.delta_h_after_damage(2), [state]
+                state.my_hero_power.exhausted = True
+                val = state.oppo_hero.delta_h_after_damage(2)
+                state.oppo_hero.get_damaged(2)
+                return val, [state]
             if cls.hand_index == -1:
                 return 0, []
             if cls.hand_index >= 0 and cls.hand_index <= 6:
@@ -113,26 +116,37 @@ class Action():
                 detail_card = state.my_hand_cards[cls.hand_index].detail_card
         elif cls.is_in_battle:
             detail_card = state.my_minions[cls.battle_index].detail_card
-        if detail_card != 0:
+        if detail_card:
             return detail_card.delta_h_after_direct(cls, state)
-        print("????????????????????????????")
-        if cls.point_oppo == -1:
-            val = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
-            state.oppo_hero.get_damaged(cls.cost_damage)
-            return val
-        if cls.point_oppo >= 0 and cls.point_oppo <= 6:
-            val = state.oppo_minions[cls.point_oppo].delta_h_after_damage(cls.cost_damage)
-            state.oppo_minions[cls.point_oppo].get_damaged(cls.cost_damage)
-            return val
-        if cls.point_self == -1:
-            val = state.my_hero.delta_h_after_heal(cls.cost_heal)
-            state.my_hero.get_heal(cls.cost_heal)
-            return val
-        if cls.point_self >= 0 and cls.point_self <= 6:
-            val = state.my_minions[cls.point_self].delta_h_after_heal(cls.cost_heal)
-            state.my_minions[cls.point_self].get_heal(cls.cost_heal)
-            return val
-            # state.my_hero.delta_h_after_damage()
+        # print("????????????????????????????")
+        if cls.is_in_battle:
+            if cls.point_oppo == -1:
+                val = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
+                state.oppo_hero.get_damaged(cls.cost_damage)
+                state.my_minions[cls.battle_index].exhausted = 1
+                return val, [state]
+            if cls.point_oppo >= 0 and cls.point_oppo <= 6:
+                val = state.oppo_minions[cls.point_oppo].delta_h_after_damage(cls.cost_damage)
+                oppo_val = state.oppo_minions[cls.point_oppo].get_damaged(cls.cost_damage)
+                my_val = state.my_minions[cls.battle_index].get_damaged(state.oppo_minions[cls.point_oppo].attack)
+                state.my_minions[cls.battle_index].exhausted = 1
+                if oppo_val:
+                    del state.oppo_minions[cls.point_oppo]
+                if my_val:
+                    del state.my_minions[cls.battle_index]
+                return val, [state]
+            # if cls.point_self == -1:
+            #     val = state.my_hero.delta_h_after_heal(cls.cost_heal)
+            #     state.my_hero.get_heal(cls.cost_heal)
+            #     return val, [state]
+            # if cls.point_self >= 0 and cls.point_self <= 6:
+            #     val = state.my_minions[cls.point_self].delta_h_after_heal(cls.cost_heal)
+            #     state.my_minions[cls.point_self].get_heal(cls.cost_heal)
+            #     return val, [state]
+                # state.my_hero.delta_h_after_damage()
+        else:
+            print("err in unknow hand card!")
+            return 0, [state]
         
 
 
@@ -209,7 +223,7 @@ class StrategyState:
         res = []
         actions = []
         if self.my_hero.can_attack:
-            print(" my hero can attack!")
+            # print(" my hero can attack!")
             if self.oppo_hero.can_be_pointed_by_minion:
                 action = Action()
                 action.set_hero_atk_hero(self)
@@ -221,8 +235,9 @@ class StrategyState:
                     actions.append(action)
             res.append(actions)
         # hero_power
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!!!self.my_hero_power.exhausted is", self.my_hero_power.exhausted)
         if not self.my_hero_power.exhausted and self.my_last_mana >= 2:
-            print(" my hero power can attack!")
+            # print(" my hero power can attack!")
             actions = []
             action = Action()
             action.set_hero_power(self, -1, 2)
@@ -253,9 +268,7 @@ class StrategyState:
             if not battle_card.can_attack_minion:
                 continue
             actions = []
-            if not has_taunt \
-                    and battle_card.can_beat_face \
-                    and self.oppo_hero.can_be_pointed_by_minion:
+            if not has_taunt and battle_card.can_beat_face and self.oppo_hero.can_be_pointed_by_minion:
             # if self.oppo_hero.can_be_pointed_by_minion:
                 action = Action()
                 action.set_minion_atk_hero(self, battle_card_index, battle_card.attack)
