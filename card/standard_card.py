@@ -367,7 +367,7 @@ class BrandonKitkouski(SpellNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        del state.my_minions[index]
+        del state.my_hand_cards[index]
         state.pay_mana(2)
         return cls.best_h_and_arg(state, 0), [state]
 
@@ -399,7 +399,7 @@ class QuickShot(SpellPointOppo):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        del state.my_minions[index]
+        del state.my_hand_cards[index]
         oppo_index = action.point_oppo
         state.pay_mana(2)
         if oppo_index == -1:
@@ -424,7 +424,7 @@ class DeadlyShot(SpellNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        del state.my_minions[index]
+        del state.my_hand_cards[index]
         states = []
         values = []
         for oppo_index, oppo_minion in enumerate(state.oppo_minions):
@@ -447,20 +447,32 @@ class AnimalCompanion(SpellNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        del state.my_minions[index]
+        del state.my_hand_cards[index]
         states = []
         values = [6, 5, 3]
         import strategy_entity
-        s1 = strategy_entity.StrategyMinion(attack = 4, taunt = 1, max_healt = 4)
+        
+        # s1 = strategy_entity.StrategyMinion(attack = 4, taunt = 1, max_health = 4)
         state1 = copy.deepcopy(state)
+        s1 = strategy_entity.StrategyMinion(card_id = 'NEW1_032', zone = 'PLAY', zone_pos = state1.my_minion_num + 1,
+                 current_cost = 3, overload = 0, is_mine = 1,
+                 attack = 4, max_health = 4,
+                 taunt = 1)
         state1.my_minions.append(s1)
         state1.pay_mana(3)
-        s2 = strategy_entity.StrategyMinion(attack = 4, rush = 1, max_healt = 2)
+        # s2 = strategy_entity.StrategyMinion(attack = 4, rush = 1, max_health = 2)
         state2 = copy.deepcopy(state)
+        s2 = strategy_entity.StrategyMinion(card_id = 'NEW1_034', zone = 'PLAY', zone_pos = state2.my_minion_num + 1,
+                 current_cost = 3, overload = 0, is_mine = 1,
+                 attack = 4, max_health = 2,
+                 exhausted = 1)
         state2.my_minions.append(s2)
         state2.pay_mana(3)
-        s3 = strategy_entity.StrategyMinion(attack = 2, max_healt = 4)
+        # s3 = strategy_entity.StrategyMinion(attack = 2, max_healt = 4)
         state3 = copy.deepcopy(state)
+        s3 = strategy_entity.StrategyMinion(card_id = 'NEW1_033', zone = 'PLAY', zone_pos = state3.my_minion_num + 1,
+                 current_cost = 3, overload = 0, is_mine = 1,
+                 attack = 2, max_health = 4)
         state3.my_minions.append(s3)
         state3.pay_mana(3)
         states = [state1 ,state2, state3]
@@ -483,9 +495,9 @@ class WorgenInfiltrator(MinionNoPoint):
         #     del state.my_minions[index]
         #     return cls.value
         if action.is_in_hand:
-            return cls.delta_h_after_direct_hand_no_point( action, state), [state]
+            return cls.delta_h_after_direct_hand_no_point( action, state)
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls( action, state), [state]
+            return cls.delta_h_after_direct_cls( action, state)
     
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
@@ -545,10 +557,10 @@ class LifeDrinker(MinionNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
-            return (cls.delta_h_after_direct_hand_no_point( action, state) + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+            return (cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
 
         if action.is_in_battle:
-            return cls.delta_h_after_direct_cls( action, state), [state]
+            return cls.delta_h_after_direct_cls( action, state)
     
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
