@@ -155,22 +155,35 @@ class MinionCard(Card):
     @classmethod
     def delta_h_after_direct_cls(cls, action, state):
         if action.is_in_battle:
+            me = state.my_minions[action.battle_index]
             oppo_minion = state.oppo_minions[action.point_oppo]
             oppo_atk = oppo_minion.attack
-            me = state.my_minions[action.battle_index]
+            val_del = me.delta_h_after_damage(oppo_atk)
+            if action.point_oppo == -1:
+                oppo_atk = 0
+                oppo_minion = state.oppo_hero
+                val_del = 0
             val_add = oppo_minion.delta_h_after_damage(action.cost_damage)
-            val_del = me.delta_h_after_damage(action.cost_damage)
-            if oppo_minion.get_damaged(action.cost_damage):
-                del state.oppo_minions[action.point_oppo]
+            oppo_minion.get_damaged(action.cost_damage)
+            me.exhausted = 1
+            if oppo_minion.health <= 0:
+                if action.point_oppo == -1:
+                    return 999999, [state]
+                else:
+                    del state.oppo_minions[action.point_oppo]
             if me.get_damaged(oppo_atk):
                 del state.my_minions[action.battle_index]
-            return (val_add - val_del) , [state]
+            val = val_add - val_del
+            return val , [state]
 
     @classmethod
     def delta_h_after_direct_hand_no_point(cls, action, state):
         if action.is_in_hand:
             index = action.hand_index
-            state.oppo_minions.append(state.my_hand_cards[index])
+            state.my_minions.append(state.my_hand_cards[index])
+            state.my_minions[-1].exhausted = 1
+            if state.my_minions[-1].rush:
+                state.my_minions[-1].attackable_by_rush = 1
             state.pay_mana(state.my_hand_cards[index].current_cost)
             del state.my_hand_cards[index]
             return cls.value, [state]
@@ -217,7 +230,7 @@ class MinionNoPoint(MinionCard):
         if state.my_last_mana < cost:
             return actions
         
-        state.pay_mana(cost)
+        # state.pay_mana(cost)
         action = strategy.Action()
         action.set_minion_put_nopoint(state, index, state.my_minion_num)
         actions.append(action)
@@ -315,5 +328,6 @@ class Coin(SpellNoPoint):
     
     @classmethod
     def delta_h_after_direct(cls, action, state):
+        del state.my_hand_cards[action.hand_index]
         state.pay_mana(-1)
         return 1, [state]
