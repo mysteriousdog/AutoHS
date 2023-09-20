@@ -163,7 +163,7 @@ class MinionCard(Card):
                 oppo_minion = state.oppo_minions[action.point_oppo]
                 oppo_atk = oppo_minion.attack
             me = state.my_minions[action.battle_index]
-            if me.exhausted:
+            if me.exhausted and me.attackable_by_rush == 0:
                 return 0, [state]
             if action.point_oppo != -1:
                 val_del = me.delta_h_after_damage(oppo_atk)
@@ -171,6 +171,7 @@ class MinionCard(Card):
             val_add = oppo_minion.delta_h_after_damage(me.attack)
             oppo_minion.get_damaged(me.attack)
             me.exhausted = 1
+            me.attackable_by_rush = 0
             if oppo_minion.health <= 0:
                 if action.point_oppo == -1:
                     return 999999, [state]

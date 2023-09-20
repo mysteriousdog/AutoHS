@@ -1,3 +1,4 @@
+# 3707 
 import random
 import sys
 import time
@@ -159,7 +160,7 @@ def init():
     log_path = HEARTHSTONE_POWER_LOG_PATH
     if os.path.exists(log_path):
         try:
-            file_handle = open(log_path, "r")
+            file_handle = open(log_path, "w")
             file_handle.seek(0)
             file_handle.truncate()
             info_print("Success to truncate Power.log")
@@ -364,12 +365,8 @@ def get_best_solution(strategy_state, action_list, k):
             print("in get_best_solution actions len is ", len(actions))
             action.show_action()
             temp_state = copy.deepcopy(strategy_state)
-            temp_val2, states = action.do_action(temp_state)
-            if len(states) == 1:
-                temp_val = temp_val2
-            else:
-                temp_val = temp_val2[0]
-            # print("temp_val0 ", temp_val)
+            temp_val, states = action.do_action(temp_state)
+            print("temp_val ", temp_val)
             # print("states0 ", states)
             if temp_val == 999999:
                 return 999999, [action]
@@ -385,8 +382,6 @@ def get_best_solution(strategy_state, action_list, k):
             # temp_best_action = best_action
             # temp_best_action = [action]
             for index, state in enumerate(states):
-                if len(states) > 1:
-                    temp_val = temp_val2[index]
                 print("in get_best_solution states len is ", len(states)) 
                 # print("in get_best_solution states hero power status is ", state.)  
                 state.debug_print_out()

@@ -368,9 +368,15 @@ class BrandonKitkouski(SpellNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
+        if state.my_hand_cards[index].current_cost > state.my_last_mana:
+            return -9999, [state]
+        state.pay_mana(state.my_hand_cards[index].current_cost)
+        
+        val = cls.best_h_and_arg(state, 0)[0]
+        if val == -99999999:
+            return -9999, [state]
         del state.my_hand_cards[index]
-        state.pay_mana(2)
-        return cls.best_h_and_arg(state, 0), [state]
+        return val, [state]
 
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
@@ -406,16 +412,24 @@ class QuickShot(SpellPointOppo):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        del state.my_hand_cards[index]
-        oppo_index = action.point_oppo
+        if state.my_hand_cards[index].current_cost > state.my_last_mana:
+            return -9999, [state]
         state.pay_mana(state.my_hand_cards[index].current_cost)
+        del state.my_hand_cards[index]
+        add_val = 0
+        if len(state.my_hand_cards) == 0:
+            print("------------------------------------------------------------------------------------------------------------------------------------------")
+            add_val = 999
+        oppo_index = action.point_oppo
         if oppo_index == -1:
+            val = state.oppo_hero.delta_h_after_damage(3) + add_val + cls.bias
             state.oppo_hero.get_damaged(3)
-            return state.oppo_hero.delta_h_after_damage(3), [state]
+            return val, [state]
         
+        val = state.oppo_minions[oppo_index].delta_h_after_damage(3) + add_val + cls.bias
         if state.oppo_minions[oppo_index].get_damaged(3):
             del state.oppo_minions[oppo_index]
-        return state.oppo_hero.delta_h_after_damage(3), [state]
+        return val, [state]
 
 
     @classmethod
@@ -451,16 +465,21 @@ class DeadlyShot(SpellNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        del state.my_hand_cards[index]
         states = []
-        values = []
+        values = cls.bias
+        oppo_num = len(state.oppo_minions)
+        if oppo_num == 0:
+            return -9999, [state]
         for oppo_index, oppo_minion in enumerate(state.oppo_minions):
             statex = copy.deepcopy(state)
             statex.pay_mana(state.my_hand_cards[index].current_cost)
             val = statex.oppo_minions[oppo_index].heuristic_val
             del statex.oppo_minions[oppo_index]
-            values.append(val)
+            del statex.my_hand_cards[index]
+            values += val
             states.append(statex)
+        values /= oppo_num
+        del state.my_hand_cards[index]
         return values, states
     
     @classmethod
@@ -478,9 +497,11 @@ class AnimalCompanion(SpellNoPoint):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
+            return -999, [state]
         del state.my_hand_cards[index]
         states = []
-        values = [6, 5, 3]
+        values = (6 + 5 + 3) / 3 + cls.bias
         import strategy_entity
         
         # s1 = strategy_entity.StrategyMinion(attack = 4, taunt = 1, max_health = 4)
@@ -488,7 +509,7 @@ class AnimalCompanion(SpellNoPoint):
         s1 = strategy_entity.StrategyMinion(card_id = 'NEW1_032', zone = 'PLAY', zone_pos = state1.my_minion_num + 1,
                  current_cost = 3, overload = 0, is_mine = 1,
                  attack = 4, max_health = 4,
-                 taunt = 1)
+                 taunt = 1, exhausted = 1)
         state1.my_minions.append(s1)
         state1.pay_mana(3)
         # s2 = strategy_entity.StrategyMinion(attack = 4, rush = 1, max_health = 2)
@@ -503,7 +524,7 @@ class AnimalCompanion(SpellNoPoint):
         state3 = copy.deepcopy(state)
         s3 = strategy_entity.StrategyMinion(card_id = 'NEW1_033', zone = 'PLAY', zone_pos = state3.my_minion_num + 1,
                  current_cost = 3, overload = 0, is_mine = 1,
-                 attack = 2, max_health = 4)
+                 attack = 2, max_health = 4, exhausted = 1)
         state3.my_minions.append(s3)
         state3.pay_mana(3)
         states = [state1 ,state2, state3]
@@ -557,6 +578,25 @@ class Tiger(MinionNoPoint):
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 
+#翡翠天爪枭 
+class JadeSkyClawOwl(MinionNoPoint):
+    value = 3 -2
+    keep_in_hand_bool = True
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return cls.delta_h_after_direct_hand_no_point( action, state)
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+
 # 冰川裂片
 class GlacialShard(MinionPointOppo):
     keep_in_hand_bool = True
@@ -581,7 +621,12 @@ class GlacialShard(MinionPointOppo):
     def delta_h_after_direct(cls, action, state):
         if action.is_in_hand:
             res = cls.value
-            res += state.oppo_minions[action.point_oppo].heuristic_val / 2
+            if action.point_oppo != -1:
+                res += state.oppo_minions[action.point_oppo].heuristic_val / 2
+            state.pay_mana(state.my_hand_cards[action.hand_index].current_cost)
+            state.my_hand_cards[action.hand_index].exhausted = 1
+            state.my_minions.append(state.my_hand_cards[action.hand_index])
+            del state.my_hand_cards[action.hand_index]
             return res, [state]
         if action.is_in_battle:
             return cls.delta_h_after_direct_cls( action, state)
@@ -591,7 +636,7 @@ class GlacialShard(MinionPointOppo):
     def get_all_actions(cls, state, index, is_in_hand):
         if is_in_hand:
             point_index = cls.utilize_delta_h_and_arg(state, 0)[2]
-            return cls.get_all_actions_MinionPoint_inhand(cls, state, index, is_in_hand, point_index)
+            return cls.get_all_actions_MinionPoint_inhand(state, index, is_in_hand, point_index)
         #    return cls.delta_h_after_direct_hand_no_point(state, index, is_in_hand)
         else:
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)

@@ -54,6 +54,7 @@ ID2CARD_DICT = {
     "CORE_SCH_713" : CultNeophyte, # 异教低阶牧师
     "CORE_EX1_284" : BlueDrogen, # 碧蓝幼龙
     "CORE_EX1_028" : Tiger, #荆棘谷猛虎
+    "CS3_037" : JadeSkyClawOwl, #翡翠天爪枭 
 
     #标准模式-法师
     "CORE_UNG_018" : FlamingFountain, # 烈焰喷泉
