@@ -60,7 +60,7 @@ class SpellNoPoint(SpellCard):
         actions = []
         if not is_in_hand:
             return actions
-        if state.my_last_mana < cost:
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
             return actions
         action = strategy.Action()
         action.set_use_nopoint_spell(state, index)
@@ -163,6 +163,8 @@ class MinionCard(Card):
                 oppo_minion = state.oppo_minions[action.point_oppo]
                 oppo_atk = oppo_minion.attack
             me = state.my_minions[action.battle_index]
+            if me.exhausted:
+                return 0, [state]
             if action.point_oppo != -1:
                 val_del = me.delta_h_after_damage(oppo_atk)
             
@@ -177,7 +179,7 @@ class MinionCard(Card):
             if me.get_damaged(oppo_atk):
                 del state.my_minions[action.battle_index]
             val = val_add - val_del
-            print("=============================val_add is ", val_add, " val_del is ", val_del)
+            # print("=============================val_add is ", val_add, " val_del is ", val_del, "oppo index is ", action.point_oppo)
             return val , [state]
 
     @classmethod
@@ -211,7 +213,7 @@ class MinionCard(Card):
                 continue
             if oppo_minion.can_be_pointed_by_minion:
                 action = strategy.Action()
-                action.set_hero_atk_minion(state, oppo_index)
+                action.set_minion_atk_minion(state, index, oppo_index, my_minion.attack)
                 actions.append(action)
         return actions
 
@@ -255,6 +257,21 @@ class MinionPointOppo(MinionCard):
             click.choose_oppo_hero()
         click.cancel_click()
         time.sleep(BASIC_MINION_PUT_INTERVAL)
+    
+    @classmethod
+    def get_all_actions_MinionPoint_inhand(cls, state, index, is_in_hand, point_index):
+        actions = []
+        if not is_in_hand:
+            return actions
+        cost = state.my_hand_cards[index].current_cost
+        if state.my_last_mana < cost:
+            return actions
+        
+        # state.pay_mana(cost)
+        action = strategy.Action()
+        action.set_minion_put_point(state, index, state.my_minion_num, point_index)
+        actions.append(action)
+        return actions
 
 
 class MinionPointMine(MinionCard):
