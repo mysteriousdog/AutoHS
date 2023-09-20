@@ -75,6 +75,12 @@ class Action():
         cls.is_in_hand = True
         cls.hand_index = my_index
         cls.put_index = pt_index
+        
+    def set_minion_put_point(cls, state, my_index, pt_index, point_index):
+        cls.is_in_hand = True
+        cls.hand_index = my_index
+        cls.put_index = pt_index
+        cls.point_oppo = point_index
 
     def set_spell_atk_hero(cls, state, index, damage):
         cls.is_in_hand = True
@@ -218,6 +224,29 @@ class StrategyState:
         self.oppo_minions.sort(key=lambda temp: temp.zone_pos)
         self.my_hand_cards.sort(key=lambda temp: temp.zone_pos)
 
+    # def __eq__(self, other):
+    #     return True
+    
+    def get_hash(self):
+        res = []
+        hand_cards = []
+        for card in self.my_hand_cards:
+            hand_cards.append(card.name)
+        
+        res.append(tuple(hand_cards))
+        status = [self.my_hero.health, self.my_hero.attack, self.my_hero.exhausted, self.my_hero_power.exhausted, self.my_last_mana]
+        res.append(tuple(status))
+        minions = []
+        for minion in self.my_minions:
+            minions.append((minion.name, minion.attack, minion.health, minion.exhausted))
+        res.append(tuple(minions))
+        oppo_minions = []
+        for minion in self.oppo_minions:
+            oppo_minions.append((minion.name, minion.attack, minion.health))
+        res.append(tuple(oppo_minions))
+        oppo_hero = [self.oppo_hero.health]
+        res.append(tuple(oppo_hero))
+        return tuple(res)
 
     def get_action_list(self):
         res = []
