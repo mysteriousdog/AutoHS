@@ -420,7 +420,18 @@ class StrategyHero(StrategyEntity):
     def delta_h_after_damage(self, damage):
         temp_hero = copy.copy(self)
         temp_hero.get_damaged(damage)
-        return self.heuristic_val - temp_hero.heuristic_val
+        val = self.heuristic_val - temp_hero.heuristic_val
+        if self.health <= 0:
+            return val * 1000
+        if self.health <= 5:
+            return val * 5
+        if self.health <= 10:
+            return val * 3
+        if self.health <= 20:
+            return val * 1.6
+        else:
+            return val
+        
 
     def delta_h_after_heal(self, heal):
         temp_hero = copy.copy(self)
