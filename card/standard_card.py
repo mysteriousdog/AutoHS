@@ -315,16 +315,17 @@ class ArcaneShot(SpellPointOppo):
             state.oppo_hero.get_damaged(2)
             return state.oppo_hero.delta_h_after_damage(2), [state]
         
+        val = state.oppo_minions[oppo_index].delta_h_after_damage(2)
         if state.oppo_minions[oppo_index].get_damaged(2):
             del state.oppo_minions[oppo_index]
-        return state.oppo_hero.delta_h_after_damage(2), [state]
+        return val, [state]
     
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
         actions = []
         if not is_in_hand:
             return actions
-        if state.my_last_mana < 1:
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
             return actions
         if state.oppo_hero.can_be_pointed_by_spell:
             action = strategy.Action()
@@ -371,6 +372,12 @@ class BrandonKitkouski(SpellNoPoint):
         state.pay_mana(2)
         return cls.best_h_and_arg(state, 0), [state]
 
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if cls.best_h_and_arg(state, index)[0] ==  -99999999:
+            return []
+        return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 2)
+
 #快速射击
 class QuickShot(SpellPointOppo):
     wait_time = 2
@@ -401,7 +408,7 @@ class QuickShot(SpellPointOppo):
         index = action.hand_index
         del state.my_hand_cards[index]
         oppo_index = action.point_oppo
-        state.pay_mana(2)
+        state.pay_mana(state.my_hand_cards[index].current_cost)
         if oppo_index == -1:
             state.oppo_hero.get_damaged(3)
             return state.oppo_hero.delta_h_after_damage(3), [state]
@@ -416,7 +423,7 @@ class QuickShot(SpellPointOppo):
         actions = []
         if not is_in_hand:
             return actions
-        if state.my_last_mana < 1:
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
             return actions
         if state.oppo_hero.can_be_pointed_by_spell:
             action = strategy.Action()
@@ -449,12 +456,16 @@ class DeadlyShot(SpellNoPoint):
         values = []
         for oppo_index, oppo_minion in enumerate(state.oppo_minions):
             statex = copy.deepcopy(state)
-            statex.pay_mana(3)
+            statex.pay_mana(state.my_hand_cards[index].current_cost)
             val = statex.oppo_minions[oppo_index].heuristic_val
             del statex.oppo_minions[oppo_index]
             values.append(val)
             states.append(statex)
         return values, states
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 3)
 
 
 # 动物伙伴
@@ -533,11 +544,6 @@ class Tiger(MinionNoPoint):
 
     @classmethod
     def delta_h_after_direct(cls, action, state):
-        # if action.is_in_hand:
-        #     index = action.hand_index
-        #     state.oppo_minions.append(state.my_minions[index])
-        #     del state.my_minions[index]
-        #     return cls.value
         if action.is_in_hand:
             return cls.delta_h_after_direct_hand_no_point( action, state)
         if action.is_in_battle:
@@ -571,11 +577,22 @@ class GlacialShard(MinionPointOppo):
 
         return best_h, state.my_minion_num, best_oppo_index
 
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            res = cls.value
+            res += state.oppo_minions[action.point_oppo].heuristic_val / 2
+            return res, [state]
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls( action, state)
+
 
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
         if is_in_hand:
-           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+            point_index = cls.utilize_delta_h_and_arg(state, 0)[2]
+            return cls.get_all_actions_MinionPoint_inhand(cls, state, index, is_in_hand, point_index)
+        #    return cls.delta_h_after_direct_hand_no_point(state, index, is_in_hand)
         else:
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
