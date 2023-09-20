@@ -342,19 +342,26 @@ def ChoosingCardAction():
             return FSM_ERROR
         time.sleep(STATE_CHECK_INTERVAL)
 
+good_dic = {}
 
-def get_best_solution(strategy_state, action_list):
+
+def get_best_solution(strategy_state, action_list, k):
     max_val = 0
     best_action = []
     temp_val = 0
     temp_action = 0
+    global good_dic
     
-    # print("in get_best_solution action_list len is ", len(action_list))
+    if strategy_state.get_hash() in good_dic:
+        print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk", k)
+        return good_dic[strategy_state.get_hash()]
+    print("-----------------------k is ", k, " ------------------------------------------")
+    k += 1
+    print("in get_best_solution action_list len is ", len(action_list))
     for actions in action_list:
         for action in actions:
-            best_action = []
             temp_val = 0
-            # print("in get_best_solution actions len is ", len(actions))
+            print("in get_best_solution actions len is ", len(actions))
             action.show_action()
             temp_state = copy.deepcopy(strategy_state)
             temp_val2, states = action.do_action(temp_state)
@@ -365,36 +372,42 @@ def get_best_solution(strategy_state, action_list):
             # print("temp_val0 ", temp_val)
             # print("states0 ", states)
             if temp_val == 999999:
-                return 999999, best_action + [action]
+                return 999999, [action]
             # print("strategy_state.my_last_mana is :", strategy_state.my_last_mana)
             # print("temp_state.my_last_mana is :", temp_state.my_last_mana)
             if len(states) == 0:
                 print("break!!!!!!!!!!!!!!!!!!")
                 continue
             
-            best_action.append(action)
-            max_val = temp_val
-            temp_best_action = best_action
+            # best_action.append(action)
+            # if temp_val > max_val:
+            #     max_val = temp_val
+            # temp_best_action = best_action
+            # temp_best_action = [action]
             for index, state in enumerate(states):
                 if len(states) > 1:
                     temp_val = temp_val2[index]
-                # print("in get_best_solution states len is ", len(states)) 
+                print("in get_best_solution states len is ", len(states)) 
                 # print("in get_best_solution states hero power status is ", state.)  
                 state.debug_print_out()
                 temp_action_list = state.get_action_list()
-                temp_val1, temp_actions = get_best_solution(state, temp_action_list)
+                temp_val1, temp_actions = get_best_solution(state, temp_action_list, k)
                 if temp_val1 == 999999:
-                    return 999999, (temp_best_action + temp_actions)
+                    return 999999, ([action] + temp_actions)
                 # print("temp_val ", temp_val)
                 # print("temp_val1 ", temp_val1)
                 temp_val += temp_val1
                 if temp_val > max_val:
                     max_val = temp_val
-                    best_action = temp_best_action + temp_actions
+                    best_action = ([action] + temp_actions)
                 temp_val -= temp_val1
-    # print("return now, max_val is ", max_val, " best_action is ", len(best_action))
-    # for ac in best_action:
-    #     ac.show_action()
+    print("return now, max_val is ", max_val, " best_action is ", len(best_action))
+    for ac in best_action:
+        ac.show_action()
+    if strategy_state.get_hash() not in good_dic:
+        good_dic[strategy_state.get_hash()] = (max_val, best_action)
+    elif good_dic[strategy_state.get_hash()][0] < max_val:
+        good_dic[strategy_state.get_hash()] = (max_val, best_action)
     return max_val, best_action
 
 
@@ -404,6 +417,14 @@ def test_battle():
     init()
     update_log_state()
     strategy_state = StrategyState(log_state)
+    temp_state = copy.deepcopy(strategy_state)
+    # a= {}
+    # print(temp_state.get_hash())
+    # if temp_state.get_hash() not in a:
+    #     print(1)
+    #     a[temp_state.get_hash()] = 1
+    # print(" ", strategy_state.get_hash() in a)
+    # print(a[strategy_state.get_hash()])
     input_info = strategy_state.debug_print_out()
     action_list = strategy_state.get_action_list()
     input_info = strategy_state.debug_print_out()
@@ -418,7 +439,7 @@ def test_battle():
     #     for action in actions:
     #         action.show_action()
     print("当前时间1：", current_time)
-    max_val, best_action = get_best_solution(strategy_state, action_list)
+    max_val, best_action = get_best_solution(strategy_state, action_list, 0)
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d %H:%M:%S") + "." + now.strftime("%S")
     print("当前时间2：", current_time)
