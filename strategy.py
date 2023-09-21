@@ -97,6 +97,10 @@ class Action():
     def set_use_nopoint_spell(cls, state, my_index):
         cls.is_in_hand = True
         cls.hand_index = my_index
+        
+    def set_use_nopoint_weapon(cls, state, my_index):
+        cls.is_in_hand = True
+        cls.hand_index = my_index
 
     def set_minion_atk_minion(cls, state, index, oppo_index, damage):
         cls.is_in_battle = True
@@ -115,7 +119,26 @@ class Action():
                 state.oppo_hero.get_damaged(2)
                 return val, [state]
             if cls.hand_index == -1:
-                return 0, []
+                if state.my_hero.exhausted:
+                    return 0, []
+                if cls.point_oppo == -1:
+                    val = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
+                    state.oppo_hero.get_damaged(cls.cost_damage)
+                elif cls.point_oppo >= 0 and cls.point_oppo <= 6:
+                    val_add = state.oppo_minions[cls.point_oppo].delta_h_after_damage(cls.cost_damage)
+                    if state.my_hero.health - state.oppo_minions[cls.point_oppo].attack <= 0:
+                        return -99999, [state]
+                    val_dec = state.my_hero.delta_h_after_damage(state.oppo_minions[cls.point_oppo].attack)
+                    state.my_hero.get_damaged(state.oppo_minions[cls.point_oppo].attack)
+                    if state.oppo_minions[cls.point_oppo].get_damaged(cls.cost_damage):
+                        del state.oppo_minions[cls.point_oppo]
+                    val = val_add -val_dec
+                state.my_hero.exhausted = 1
+                if state.my_weapon:
+                    state.my_weapon.durability -= 1
+                    val -= state.my_weapon.attack
+                    state.my_weapon = None
+                return val, [state]
             if cls.hand_index >= 0 and cls.hand_index <= 6:
                 if state.my_hand_cards[cls.hand_index].current_cost > state.my_last_mana:
                     return 0, []
