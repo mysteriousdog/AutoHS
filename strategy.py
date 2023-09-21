@@ -94,6 +94,13 @@ class Action():
         cls.point_oppo = oppo_index
         cls.cost_damage = damage
 
+    def set_spell_point_self_minon(cls, state, my_index, minion_index, add_atk, add_health):
+        cls.is_in_hand = True
+        cls.hand_index = my_index
+        cls.point_self = minion_index
+        cls.cost_damage = add_atk
+        cls.cost_heal = add_health
+
     def set_use_nopoint_spell(cls, state, my_index):
         cls.is_in_hand = True
         cls.hand_index = my_index
@@ -112,7 +119,8 @@ class Action():
         detail_card = None
         if cls.is_in_hand:
             if cls.hand_index == -2:
-                if not state.pay_mana(2):
+                from card.standard_card import Hero_power_cost_dec_num
+                if state.my_last_mana < (2 - Hero_power_cost_dec_num):
                     return 0, []
                 state.my_hero_power.exhausted = True
                 val = state.oppo_hero.delta_h_after_damage(2)
@@ -289,7 +297,8 @@ class StrategyState:
         # hero_power
         # print("!!!!!!!!!!!!!!!!!!!!!!!!!!self.my_hero_power.exhausted is", self.my_hero_power.exhausted)
         # if self.my_last_mana > 0:
-        if not self.my_hero_power.exhausted and self.my_last_mana >= 2:
+        from card.standard_card import Hero_power_cost_dec_num
+        if not self.my_hero_power.exhausted and self.my_last_mana >= (2 - Hero_power_cost_dec_num):
             # print(" my hero power can attack!")
             actions = []
             action = Action()

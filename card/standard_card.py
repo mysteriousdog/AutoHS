@@ -5,6 +5,8 @@ import statistics
 import copy
 import strategy
 BrandonKitkouski_used_before = 0
+Hero_power_cost_dec_num = 0
+Hero_power_cost_5_damage_random = False
 # 护甲商贩
 class ArmorVendor(MinionNoPoint):
     value = 2
@@ -817,8 +819,175 @@ class BlueDrogen(MinionNoPoint):
            return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
         else:
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+
+class DragonDestroyingCrossbow(MinionNoPoint):
+    value = 8 - 5 + 2
+    keep_in_hand_bool = False
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        global Hero_power_cost_5_damage_random
+        if action.is_in_hand:
+            Hero_power_cost_5_damage_random = True
+            return (cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
+
+        if action.is_in_battle:
+            mins_num = len(state.my_minions)
+            res_val, res_ste = cls.delta_h_after_direct_cls( action, state)
+            if len(state.my_minions) < mins_num:
+                Hero_power_cost_5_damage_random = False
+            return res_val, res_ste
+
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+# 草原狮
+class GrasslandLion(MinionNoPoint):
+    value = 12 - 6 + 2
+    keep_in_hand_bool = False
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return cls.delta_h_after_direct_hand_no_point( action, state)
+
+        if action.is_in_battle:
+            mins_num = len(state.my_minions)
+            res_val, res_ste = cls.delta_h_after_direct_cls( action, state)
+            if len(state.my_minions) < mins_num:
+                res_val += 8
+            return res_val, res_ste
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+# 豹子戏法
+class LeopardTrick(SpellNoPoint):
+    bias = -4
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
+            return -999, [state]
+        del state.my_hand_cards[index]
+        state.pay_mana(state.my_hand_cards[index].current_cost)
+        return cls.bias + 4 + 2 + 1, [state]
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 3)
+
+# 游荡的怪物
+class WanderingMonster(SpellNoPoint):
+    bias = -4
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
+            return -999, [state]
+        del state.my_hand_cards[index]
+        state.pay_mana(state.my_hand_cards[index].current_cost)
+        return cls.bias + 3 + 3, [state]
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 3)
+
+#导览员
+class Docent(MinionNoPoint):
+    value = 2 - 2
+    keep_in_hand_bool = True
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        global Hero_power_cost_dec_num
+        if action.is_in_hand:
+            val, res_state = cls.delta_h_after_direct_hand_no_point( action, state)
+            cls.value += val
+            if Hero_power_cost_dec_num == 0:
+                cls.value += 2
+                Hero_power_cost_dec_num = 2
+            return cls.value, res_state
+
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+
+# 蜡烛弓
+class Candlebow(WeaponCard):
+    keep_in_hand_bool = False
+    value =  3
+    
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        if state.my_weapon is not None:
+            val -= state.my_weapon.attack * state.my_weapon.durability
+        state.my_weapon = state.my_hand_cards[index]
+        del state.my_hand_cards[index]
+        return cls.val, [state]
+
+
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_weapon(state, index, 1)
     
 
+# 狗饼干
+class DogBiscuit(SpellPointMine):
+    wait_time = 2
+    # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
+    bias = -3
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        if state.my_hand_cards[index].current_cost > state.my_last_mana:
+            return -9999, [state]
+        state.pay_mana(state.my_hand_cards[index].current_cost)
+        del state.my_hand_cards[index]
+
+        minion = state.oppo_minions[action.point_self]
+        minion.attack += action.cost_damage
+        minion.health += action.cost_heal
+       
+        return action.cost_damage + action.cost_heal + cls.bias, [state]
+
+
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        actions = []
+        if not is_in_hand:
+            return actions
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
+            return actions
+        if state.oppo_hero.can_be_pointed_by_spell:
+            action = strategy.Action()
+            action.set_spell_atk_hero(state, index, 3)
+            actions.append(action)
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            action = strategy.Action()
+            action.set_spell_point_self_minon(state, index, oppo_index, 2, 3)
+            actions.append(action)
+        return actions
+ 
 
 ############################################################
 # 烈焰喷泉

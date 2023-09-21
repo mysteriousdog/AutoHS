@@ -55,6 +55,13 @@ ID2CARD_DICT = {
     "CORE_EX1_284" : BlueDrogen, # 碧蓝幼龙
     "CORE_EX1_028" : Tiger, #荆棘谷猛虎
     "CS3_037" : JadeSkyClawOwl, #翡翠天爪枭 
+    "CORE_LOOT_222" : Candlebow, #蜡烛弓
+    "CORE_DED_009" : DogBiscuit, #狗饼干
+    "CORE_SCH_312" : Docent, #导览员
+    "CORE_KAR_004" : LeopardTrick, # 豹子戏法
+    "CORE_LOOT_079" : WanderingMonster, # 游荡的怪物
+    "CORE_EX1_534" : GrasslandLion, # 草原狮
+    "CORE_DRG_256" : DragonDestroyingCrossbow, # 灭龙弩
 
     #标准模式-法师
     "CORE_UNG_018" : FlamingFountain, # 烈焰喷泉

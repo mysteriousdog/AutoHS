@@ -99,6 +99,22 @@ class SpellPointMine(SpellCard):
         click.choose_my_minion(mine_index, state.my_minion_num)
         click.cancel_click()
         time.sleep(cls.wait_time)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        actions = []
+        if not is_in_hand:
+            return actions
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
+            return actions
+
+        for oppo_index, oppo_minion in enumerate(state.my_minions):
+            if not oppo_minion.can_be_pointed_by_spell:
+                continue
+            action = strategy.Action()
+            action.set_spell_atk_minon(state, index, oppo_index, 3)
+            actions.append(action)
+        return actions
 
 
 class MinionCard(Card):
