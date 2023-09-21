@@ -285,7 +285,7 @@ class BloodOfGhuun(MinionNoPoint):
 class ArcaneShot(SpellPointOppo):
     wait_time = 2
     # 加个bias,一是包含了消耗的水晶的代价，二是包含了消耗了手牌的代价
-    bias = -2.5
+    bias = -2
 
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
@@ -453,7 +453,7 @@ class QuickShot(SpellPointOppo):
  
 # 致命射击
 class DeadlyShot(SpellNoPoint):
-    bias = -5
+    bias = -4
 
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
@@ -479,11 +479,13 @@ class DeadlyShot(SpellNoPoint):
             values += val
             states.append(statex)
         values /= oppo_num
-        del state.my_hand_cards[index]
+        # del state.my_hand_cards[index]
         return values, states
     
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
+        if len(state.oppo_minions) == 0:
+            return []
         return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 3)
 
 
@@ -560,7 +562,7 @@ class WorgenInfiltrator(MinionNoPoint):
         
 # 荆棘谷猛虎
 class Tiger(MinionNoPoint):
-    value = 10 - 5 - 1 + 2
+    value = 10 - 5 - 1 + 1
     keep_in_hand_bool = False
 
     @classmethod
@@ -580,7 +582,7 @@ class Tiger(MinionNoPoint):
 
 #翡翠天爪枭 
 class JadeSkyClawOwl(MinionNoPoint):
-    value = 3 -2
+    value = 3 - 2 + 1
     keep_in_hand_bool = True
 
     @classmethod
@@ -648,7 +650,13 @@ class LifeDrinker(MinionNoPoint):
 
     @classmethod
     def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        if state.oppo_hero.health <= 25:
+            cls.value += 0.5
+        if state.oppo_hero.health <= 20:
+            cls.value += 1
         if state.oppo_hero.health <= 15:
+            cls.value += 1
+        if state.oppo_hero.health <= 8:
             cls.value += 1
         if state.my_hero.health <= 27:
             cls.value += 0.5
@@ -998,3 +1006,135 @@ class FireSourceTransmissionGate(SpellPointOppo):
                 best_oppo_index = oppo_index
 
         return best_delta_h, best_oppo_index
+
+
+
+#################################################战士###############################################################
+####################################################################################################################
+
+
+class HeroicStrike(SpellNoPoint):
+    bias = -3
+    
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        if state.my_hero.exhausted:
+            del state.my_hand_cards[index]
+            return -999, [state]
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
+            del state.my_hand_cards[index]
+            return -999, [state]
+        state.pay_mana(state.my_hand_cards[index].current_cost)
+        del state.my_hand_cards[index]
+        state.my_hero.attack += 4
+        return cls.bias, state
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_cls(state, index, is_in_hand, 2)
+
+
+class BattleAxe(WeaponCard):
+    keep_in_hand_bool = True
+    value = -3 + 6
+    
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        if state.my_weapon is not None:
+            val -= state.my_weapon.attack * state.my_weapon.durability
+        state.my_weapon = state.my_hand_cards[index]
+        del state.my_hand_cards[index]
+        return cls.val, [state]
+
+
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_weapon(state, index, 2)
+    
+
+class OriginAxe(WeaponCard):
+    keep_in_hand_bool = False
+    value = -6 + 10
+    
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        index = action.hand_index
+        if state.my_weapon is not None:
+            val -= state.my_weapon.attack * state.my_weapon.durability
+        state.my_weapon = state.my_hand_cards[index]
+        del state.my_hand_cards[index]
+        return cls.val, [state]
+
+
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        return cls.get_all_actions_nopoint_weapon(state, index, 5)
+    
+    
+class KukaronEliteGuard(MinionNoPoint):
+    keep_in_hand_bool = False
+    value = 7 - 5
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            return cls.delta_h_after_direct_hand_no_point( action, state)
+
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls( action, state)
+    
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+           return cls.get_all_actions_MinionNoPoint_inhand(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+        
+        
+
+class CruelTaskMaster(MinionPointOppo):
+    keep_in_hand_bool = True
+    value = 3 - 2
+    @classmethod
+    def utilize_delta_h_and_arg(cls, state, hand_card_index):
+        best_h = cls.value + state.oppo_hero.heuristic_val / 10
+        best_oppo_index = -1
+
+        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+            if not oppo_minion.can_be_pointed_by_minion:
+                continue
+
+            delta_h = cls.value +  oppo_minion.heuristic_val / 2
+            if delta_h > best_h:
+                best_h = delta_h
+                best_oppo_index = oppo_index
+
+        return best_h, state.my_minion_num, best_oppo_index
+
+    @classmethod
+    def delta_h_after_direct(cls, action, state):
+        if action.is_in_hand:
+            res = cls.value
+            if action.point_oppo != -1:
+                res += state.oppo_minions[action.point_oppo].heuristic_val / 2
+            state.pay_mana(state.my_hand_cards[action.hand_index].current_cost)
+            state.my_hand_cards[action.hand_index].exhausted = 1
+            state.my_minions.append(state.my_hand_cards[action.hand_index])
+            del state.my_hand_cards[action.hand_index]
+            return res, [state]
+        if action.is_in_battle:
+            return cls.delta_h_after_direct_cls( action, state)
+
+
+    @classmethod
+    def get_all_actions(cls, state, index, is_in_hand):
+        if is_in_hand:
+            point_index = cls.utilize_delta_h_and_arg(state, 0)[2]
+            return cls.get_all_actions_MinionPoint_inhand(state, index, is_in_hand, point_index)
+        #    return cls.delta_h_after_direct_hand_no_point(state, index, is_in_hand)
+        else:
+            return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
+####################################################################################################################
+#################################################战士###############################################################
