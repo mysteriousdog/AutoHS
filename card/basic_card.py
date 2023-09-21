@@ -188,7 +188,10 @@ class MinionCard(Card):
         if action.is_in_hand:
             index = action.hand_index
             state.my_minions.append(state.my_hand_cards[index])
-            state.my_minions[-1].exhausted = 1
+            if state.my_minions[-1].charge:
+                state.my_minions[-1].exhausted = 0
+            else:
+                state.my_minions[-1].exhausted = 1
             if state.my_minions[-1].rush:
                 state.my_minions[-1].attackable_by_rush = 1
             state.pay_mana(state.my_hand_cards[index].current_cost)
@@ -242,7 +245,23 @@ class MinionNoPoint(MinionCard):
         action.set_minion_put_nopoint(state, index, state.my_minion_num)
         actions.append(action)
         return actions
-        
+
+
+class MinionPointAllMinions(MinionCard):
+    @classmethod
+    def use_with_arg(cls, state, card_index, *args):
+        gap_index = args[0]
+        oppo_index = args[1]
+        my_index = args[2]
+
+        click.choose_card(card_index, state.my_hand_card_num)
+        click.put_minion(gap_index, state.my_minion_num)
+        if oppo_index >= 0:
+            click.choose_opponent_minion(oppo_index, state.oppo_minion_num)
+        elif my_index >= 0:
+            click.choose_my_minion(my_index, state.my_minion_num + 1)
+        click.cancel_click()
+        time.sleep(BASIC_MINION_PUT_INTERVAL)
 
 class MinionPointOppo(MinionCard):
     @classmethod
@@ -310,6 +329,15 @@ class WeaponCard(Card):
         else:
             return cls.value,
     # TODO: 还什么都没实现...
+    @classmethod
+    def get_all_actions_nopoint_weapon(cls, state, index, cost):
+        actions = []
+        if state.my_last_mana < state.my_hand_cards[index].current_cost:
+            return actions
+        action = strategy.Action()
+        action.set_use_nopoint_weapon(state, index)
+        actions.append(action)
+        return actions
 
 
 class HeroPowerCard(Card):
@@ -353,3 +381,4 @@ class Coin(SpellNoPoint):
         del state.my_hand_cards[action.hand_index]
         state.pay_mana(-1)
         return 1, [state]
+
