@@ -5,8 +5,6 @@ import statistics
 import copy
 import strategy
 BrandonKitkouski_used_before = 0
-Hero_power_cost_dec_num = 0
-Hero_power_cost_5_damage_random = False
 # 护甲商贩
 class ArmorVendor(MinionNoPoint):
     value = 2
@@ -353,12 +351,10 @@ class BrandonKitkouski(SpellNoPoint):
     
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
-        global BrandonKitkouski_used_before
-        print("in BrandonKitkouski BrandonKitkouski_used_before is ", BrandonKitkouski_used_before)
-        if BrandonKitkouski_used_before == 0:
-            BrandonKitkouski_used_before = 1;
+        if state.BrandonKitkouski_used_before == 0:
+            state.BrandonKitkouski_used_before = 1
             return 1000000,
-        if BrandonKitkouski_used_before == 1:
+        if state.BrandonKitkouski_used_before == 1:
             for entity in state.my_graveyard:
                 if entity.name == "爆炸陷阱":
                     return cls.bias + sum([minion.delta_h_after_damage(2)
@@ -826,17 +822,11 @@ class DragonDestroyingCrossbow(MinionNoPoint):
 
     @classmethod
     def delta_h_after_direct(cls, action, state):
-        global Hero_power_cost_5_damage_random
         if action.is_in_hand:
-            Hero_power_cost_5_damage_random = True
-            return (cls.delta_h_after_direct_hand_no_point( action, state)[0] + cls.utilize_delta_h_and_arg(state, 0)[0]), [state]
-
+            return cls.delta_h_after_direct_hand_no_point( action, state)
         if action.is_in_battle:
-            mins_num = len(state.my_minions)
-            res_val, res_ste = cls.delta_h_after_direct_cls( action, state)
-            if len(state.my_minions) < mins_num:
-                Hero_power_cost_5_damage_random = False
-            return res_val, res_ste
+            return cls.delta_h_after_direct_cls( action, state)
+
 
     
     @classmethod
@@ -909,13 +899,12 @@ class Docent(MinionNoPoint):
 
     @classmethod
     def delta_h_after_direct(cls, action, state):
-        global Hero_power_cost_dec_num
         if action.is_in_hand:
             val, res_state = cls.delta_h_after_direct_hand_no_point( action, state)
             cls.value += val
-            if Hero_power_cost_dec_num == 0:
+            if state.Hero_power_cost_dec_num == 0:
                 cls.value += 2
-                Hero_power_cost_dec_num = 2
+                state.dec_heroPowerCost()
             return cls.value, res_state
 
         if action.is_in_battle:
