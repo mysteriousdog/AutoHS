@@ -119,9 +119,10 @@ class Action():
         detail_card = None
         if cls.is_in_hand:
             if cls.hand_index == -2:
-                from card.standard_card import Hero_power_cost_dec_num
-                if state.my_last_mana < (2 - Hero_power_cost_dec_num):
-                    return 0, []
+                # from card.standard_card import Hero_power_cost_dec_num
+                if (state.my_last_mana < (state.get_heroPowerCost())) or state.my_hero_power.exhausted:
+                    return -99, [state]
+                return state.use_heroPower()
                 state.my_hero_power.exhausted = True
                 val = state.oppo_hero.delta_h_after_damage(2)
                 state.oppo_hero.get_damaged(2)
@@ -203,7 +204,8 @@ class StrategyState:
         self.oppo_hero_power = None
         self.oppo_weapon = None
         self.oppo_hand_card_num = 0
-
+        self.Hero_power_cost_dec_num = 0
+        self.BrandonKitkouski_used_before = 0
         self.my_total_mana = int(log_state.my_entity.query_tag("RESOURCES"))
         self.my_used_mana = int(log_state.my_entity.query_tag("RESOURCES_USED"))
         self.my_temp_mana = int(log_state.my_entity.query_tag("TEMP_RESOURCES"))
@@ -258,6 +260,35 @@ class StrategyState:
     # def __eq__(self, other):
     #     return True
     
+    def dec_heroPowerCost(self):
+        self.Hero_power_cost_dec_num = self.my_hero_power.current_cost
+        
+    def get_heroPowerCost(self):
+        return self.my_hero_power.current_cost - self.Hero_power_cost_dec_num
+    
+    def use_heroPower(self):
+        self.my_hero_power.exhausted = True
+        val = self.oppo_hero.delta_h_after_damage(2)
+        self.oppo_hero.get_damaged(2)
+        self.pay_mana(self.get_heroPowerCost())
+        self.Hero_power_cost_dec_num = 0
+
+        if self.oppo_hero.health <= 0:
+            return 999999, [self]
+        for minion in self.my_minions:
+            if minion.card_id == 'CORE_DRG_256':
+                states = []
+                val2 = 0
+                for oppo_index, _ in enumerate(self.oppo_minions):
+                    statex = copy.deepcopy(self)
+                    oppo_minion = statex.oppo_minions[oppo_index]
+                    val2 += oppo_minion.delta_h_after_damage(5)
+                    if oppo_minion.get_damaged(5):
+                        del statex.oppo_minions[oppo_index]
+                    states.append(statex)
+                return val + val2 / len(states), states
+        return val, [self] 
+    
     def get_hash(self):
         res = []
         hand_cards = []
@@ -298,7 +329,7 @@ class StrategyState:
         # print("!!!!!!!!!!!!!!!!!!!!!!!!!!self.my_hero_power.exhausted is", self.my_hero_power.exhausted)
         # if self.my_last_mana > 0:
         from card.standard_card import Hero_power_cost_dec_num
-        if not self.my_hero_power.exhausted and self.my_last_mana >= (2 - Hero_power_cost_dec_num):
+        if not self.my_hero_power.exhausted and self.my_last_mana >= (self.get_heroPowerCost()):
             # print(" my hero power can attack!")
             actions = []
             action = Action()
