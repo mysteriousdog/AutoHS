@@ -143,10 +143,11 @@ class Action():
                         del state.oppo_minions[cls.point_oppo]
                     val = val_add -val_dec
                 state.my_hero.exhausted = 1
-                if state.my_weapon:
+                if state.my_weapon is not None:
                     state.my_weapon.durability -= 1
-                    val -= state.my_weapon.attack
-                    state.my_weapon = None
+                    val -= state.my_weapon.attack / 2
+                    if state.my_weapon.durability <= 0:
+                        state.my_weapon = None
                 return val, [state]
             if cls.hand_index >= 0 and cls.hand_index <= 6:
                 if state.my_hand_cards[cls.hand_index].current_cost > state.my_last_mana:
@@ -313,14 +314,16 @@ class StrategyState:
     def get_action_list(self):
         res = []
         actions = []
+        touchable_oppo_minions = self.touchable_oppo_minions
+        has_taunt = self.oppo_has_taunt
         if self.my_hero.can_attack:
             # print(" my hero can attack!")
-            if self.oppo_hero.can_be_pointed_by_minion:
+            if self.oppo_hero.can_be_pointed_by_minion and not has_taunt:
                 action = Action()
                 action.set_hero_atk_hero(self)
                 actions.append(action)
             for oppo_index, oppo_minion in enumerate(self.oppo_minions):
-                if oppo_minion.can_be_pointed_by_minion:
+                if oppo_minion.can_be_pointed_by_minion and (oppo_minion in touchable_oppo_minions):
                     action = Action()
                     action.set_hero_atk_minion(self, oppo_index)
                     actions.append(action)
@@ -328,7 +331,7 @@ class StrategyState:
         # hero_power
         # print("!!!!!!!!!!!!!!!!!!!!!!!!!!self.my_hero_power.exhausted is", self.my_hero_power.exhausted)
         # if self.my_last_mana > 0:
-        from card.standard_card import Hero_power_cost_dec_num
+        # from card.standard_card import Hero_power_cost_dec_num
         if not self.my_hero_power.exhausted and self.my_last_mana >= (self.get_heroPowerCost()):
             # print(" my hero power can attack!")
             actions = []
@@ -354,8 +357,8 @@ class StrategyState:
                 actions = detail_card.get_all_actions(self, hand_card_index, True)
 
             res.append(actions)
-        touchable_oppo_minions = self.touchable_oppo_minions
-        has_taunt = self.oppo_has_taunt
+        # touchable_oppo_minions = self.touchable_oppo_minions
+        # has_taunt = self.oppo_has_taunt
         for battle_card_index, battle_card in enumerate(self.my_minions):
             # print("battle_card_index is :", battle_card_index)
             if not battle_card.can_attack_minion:

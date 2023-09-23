@@ -501,7 +501,7 @@ class AnimalCompanion(SpellNoPoint):
             return -999, [state]
         del state.my_hand_cards[index]
         states = []
-        values = (6 + 5 + 3) / 3 + cls.bias
+        values = (10 + 9 + 7) / 3 + cls.bias
         import strategy_entity
         
         # s1 = strategy_entity.StrategyMinion(attack = 4, taunt = 1, max_health = 4)
@@ -867,8 +867,8 @@ class LeopardTrick(SpellNoPoint):
         index = action.hand_index
         if state.my_last_mana < state.my_hand_cards[index].current_cost:
             return -999, [state]
-        del state.my_hand_cards[index]
         state.pay_mana(state.my_hand_cards[index].current_cost)
+        del state.my_hand_cards[index]
         return cls.bias + 4 + 2 + 1, [state]
     
     @classmethod
@@ -884,8 +884,8 @@ class WanderingMonster(SpellNoPoint):
         index = action.hand_index
         if state.my_last_mana < state.my_hand_cards[index].current_cost:
             return -999, [state]
-        del state.my_hand_cards[index]
         state.pay_mana(state.my_hand_cards[index].current_cost)
+        del state.my_hand_cards[index]
         return cls.bias + 3 + 3, [state]
     
     @classmethod
@@ -902,7 +902,7 @@ class Docent(MinionNoPoint):
         if action.is_in_hand:
             val, res_state = cls.delta_h_after_direct_hand_no_point( action, state)
             cls.value += val
-            if state.Hero_power_cost_dec_num == 0:
+            if state.Hero_power_cost_dec_num == 0 and not state.my_hero_power.exhausted:
                 cls.value += 2
                 state.dec_heroPowerCost()
             return cls.value, res_state
@@ -920,16 +920,19 @@ class Docent(MinionNoPoint):
 # 蜡烛弓
 class Candlebow(WeaponCard):
     keep_in_hand_bool = False
-    value =  3
+    value =  1
     
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
         if state.my_weapon is not None:
-            val -= state.my_weapon.attack * state.my_weapon.durability
+            cls.value -= state.my_weapon.attack * state.my_weapon.durability
+            print("============================ state.my_weapon.attack ", state.my_weapon.attack, " value ", cls.value)
+            print("============================ state.my_weapon.durability is ", state.my_weapon.durability)
         state.my_weapon = state.my_hand_cards[index]
+        state.pay_mana(state.my_hand_cards[index].current_cost)
         del state.my_hand_cards[index]
-        return cls.val, [state]
+        return cls.value, [state]
 
 
     @classmethod
@@ -951,10 +954,11 @@ class DogBiscuit(SpellPointMine):
         state.pay_mana(state.my_hand_cards[index].current_cost)
         del state.my_hand_cards[index]
 
-        minion = state.oppo_minions[action.point_self]
+        minion = state.my_minions[action.point_self]
         minion.attack += action.cost_damage
-        minion.health += action.cost_heal
-       
+        minion.max_health += action.cost_heal
+        if not minion.exhausted:
+            cls.bias += minion.attack + minion.max_health
         return action.cost_damage + action.cost_heal + cls.bias, [state]
 
 
@@ -965,11 +969,7 @@ class DogBiscuit(SpellPointMine):
             return actions
         if state.my_last_mana < state.my_hand_cards[index].current_cost:
             return actions
-        if state.oppo_hero.can_be_pointed_by_spell:
-            action = strategy.Action()
-            action.set_spell_atk_hero(state, index, 3)
-            actions.append(action)
-        for oppo_index, oppo_minion in enumerate(state.oppo_minions):
+        for oppo_index, oppo_minion in enumerate(state.my_minions):
             if not oppo_minion.can_be_pointed_by_spell:
                 continue
             action = strategy.Action()
