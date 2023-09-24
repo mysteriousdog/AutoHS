@@ -957,7 +957,7 @@ class DogBiscuit(SpellPointMine):
         minion = state.my_minions[action.point_self]
         minion.attack += action.cost_damage
         minion.max_health += action.cost_heal
-        if not minion.exhausted:
+        if minion.exhausted != 1:
             cls.bias += minion.attack + minion.max_health
         return action.cost_damage + action.cost_heal + cls.bias, [state]
 

@@ -12,9 +12,9 @@ from click import enter_HS_step_2
 if __name__ == "__main__":
     # check_name()
     print_info_init()
-    # init()
+    init()
     read_passwd_file(r'value.txt')
     keyboard.add_hotkey("ctrl+q", system_exit)
-    enter_battle_from_login()
-    enter_HS_step_2()
+    # enter_battle_from_login()
+    # enter_HS_step_2()
     AutoHS_automata()

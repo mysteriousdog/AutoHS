@@ -354,19 +354,19 @@ def get_best_solution(strategy_state, action_list, k):
     global good_dic
     
     if strategy_state.get_hash() in good_dic:
-        print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk", k)
+        # print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk", k)
         return good_dic[strategy_state.get_hash()]
-    print("-----------------------k is ", k, " ------------------------------------------")
-    k += 1
-    print("in get_best_solution action_list len is ", len(action_list))
+    # print("-----------------------k is ", k, " ------------------------------------------")
+    # k += 1
+    # print("in get_best_solution action_list len is ", len(action_list))
     for actions in action_list:
         for action in actions:
             temp_val = 0
-            print("in get_best_solution actions len is ", len(actions))
-            action.show_action()
+            # print("in get_best_solution actions len is ", len(actions))
+            # action.show_action()
             temp_state = copy.deepcopy(strategy_state)
             temp_val, states = action.do_action(temp_state)
-            print("temp_val ", temp_val)
+            # print("temp_val ", temp_val)
             # print("states0 ", states)
             if temp_val == 999999:
                 return 999999, [action]
@@ -382,9 +382,9 @@ def get_best_solution(strategy_state, action_list, k):
             # temp_best_action = best_action
             # temp_best_action = [action]
             for index, state in enumerate(states):
-                print("in get_best_solution states len is ", len(states)) 
-                # print("in get_best_solution states hero power status is ", state.)  
-                state.debug_print_out()
+                # print("in get_best_solution states len is ", len(states)) 
+                # # print("in get_best_solution states hero power status is ", state.)  
+                # state.debug_print_out()
                 temp_action_list = state.get_action_list()
                 temp_val1, temp_actions = get_best_solution(state, temp_action_list, k)
                 if temp_val1 == 999999:
@@ -396,9 +396,9 @@ def get_best_solution(strategy_state, action_list, k):
                     max_val = temp_val
                     best_action = ([action] + temp_actions)
                 temp_val -= temp_val1
-    print("return now, max_val is ", max_val, " best_action is ", len(best_action))
-    for ac in best_action:
-        ac.show_action()
+    # print("return now, max_val is ", max_val, " best_action is ", len(best_action))
+    # for ac in best_action:
+    #     ac.show_action()
     if strategy_state.get_hash() not in good_dic:
         good_dic[strategy_state.get_hash()] = (max_val, best_action)
     elif good_dic[strategy_state.get_hash()][0] < max_val:
@@ -471,57 +471,7 @@ def Battling():
             else:
                 info_print("你输了")
             return FSM_QUITTING_BATTLE
-        # strategy_state = StrategyState(log_state)
-        # input_info = strategy_state.debug_print_out()
-        # print("input_info is :", input_info)
-        # if len(input_info[-1]) != 3:
-        #     predict_input_info = predict_model.predict_action(input_info)
-        #     print("predict_input_info is :", predict_input_info)
         
-        # return FSM_BATTLING
-        # if len(input_info) == 3:
-        # if len(input_info) >= 2 and len(input_info[-1]) == 3:
-        #     # print("action from user_input: ", input_info)
-        #     get_index = input_info[-1][0]
-        #     put_index = input_info[-1][1]
-        #     point_index = input_info[-1][2]
-        #     if get_index == -1:
-        #         click.end_turn()
-        #         data_x.append(input_info[:-1])
-        #         data_y.append(input_info[-1])
-        #         dump_data_x(data_x)
-        #         dump_data_y(data_y)
-        #         return FSM_BATTLING
-        #     if get_index <= (strategy_state.my_hand_card_num) and get_index >= 1:
-        #         print(1)
-        #         # strategy_state.use_best_entity(get_index, [1, put_index, point_index])
-        #         click.choose_card(get_index - 1, strategy_state.my_hand_card_num)
-        #         if isinstance(strategy_state.my_hand_cards[get_index -1], StrategyMinion) and put_index >= 1 and put_index <= 7:
-        #             click.put_minion(put_index - 1, strategy_state.my_minion_num)
-        #         if point_index == 0 and isinstance(strategy_state.my_hand_cards[get_index -1], StrategySpell):
-        #             click.choose_my_minion(0, 1);
-        #     elif get_index == 0:
-        #         # zlh.test_battle_hero_power_click()
-        #         hero_power = strategy_state.my_detail_hero_power
-        #         hero_power.use_with_arg(strategy_state, -1, [])
-        #     else:
-        #         click.choose_my_minion(get_index - strategy_state.my_hand_card_num - 1, strategy_state.my_minion_num)
-            
-        #     if point_index >= 1 and point_index <= 7:
-        #             click.choose_opponent_minion(point_index - 1, strategy_state.oppo_minion_num)
-        #     elif point_index == 8:
-            
-        #         click.choose_oppo_hero()
-        #     # TODO mk func choose card to put && point
-        #     data_x.append(input_info[:-1])
-        #     data_y.append(input_info[-1])
-        #     dump_data_x(data_x)
-        #     dump_data_y(data_y)
-        #     # with open('data_x.txt', 'w') as file:
-        #     #     json.dump(data_x, file)
-        #     # with open('data_y.txt', 'w') as file:
-        #     #     json.dump(data_y, file)
-        # return FSM_BATTLING
         # 在对方回合等就行了
         if not log_state.is_my_turn:
             print("========================not my turn=========================")
@@ -532,7 +482,7 @@ def Battling():
             if not_mine_count >= 400:
                 warn_print("Time out in Opponent's turn")
                 return FSM_ERROR
-            time.sleep(15)
+            time.sleep(5)
             continue
 
         # 接下来考虑在我的回合的出牌逻辑
@@ -581,33 +531,59 @@ def Battling():
         ok = update_log_state()
         strategy_state = StrategyState(log_state)
         strategy_state.debug_print_out()
-
-        # 考虑要不要出牌
-        index, args = strategy_state.best_h_index_arg()
-
-        # index == -1 代表使用技能, -2 代表不出牌
-        if index != -2:
+        action_list = strategy_state.get_action_list()
+        max_val, best_action = get_best_solution(strategy_state, action_list, 0)
+        if len(best_action) == 0:
+            click.end_turn()
+            time.sleep(STATE_CHECK_INTERVAL)
+        best_action = best_action[0]
+        if best_action.is_in_hand:
+            if best_action.hand_index == -2:
+                index = -1
+            else:
+                index = best_action.hand_index
+            args = []
+            if best_action.put_index != -3:
+                args.append(best_action.put_index)
+            elif best_action.point_oppo != -3:
+                args.append(best_action.point_oppo)
+            elif best_action.point_self != -3:
+                args.append(best_action.point_self)
+            else:
+                print("err in action !!!!!!!!!!!!!!!!!!!!!!!!!!")
+                continue
             strategy_state.use_best_entity(index, args)
             continue
+        else:
+            index = best_action.battle_index
+            oppo_index = best_action.point_oppo
+            strategy_state.my_entity_attack_oppo(index, oppo_index)
+        # # 考虑要不要出牌
+        # index, args = strategy_state.best_h_index_arg()
+
+        # # index == -1 代表使用技能, -2 代表不出牌
+        # if index != -2:
+        #     strategy_state.use_best_entity(index, args)
+        #     continue
 
         # 如果不出牌, 考虑随从怎么打架
-        my_index, oppo_index = strategy_state.get_best_attack_target()
+        # my_index, oppo_index = strategy_state.get_best_attack_target()
 
-        # my_index == -1代表英雄攻击, -2 代表不攻击
-        if my_index != -2:
-            strategy_state.my_entity_attack_oppo(my_index, oppo_index)
-        else:
-            print("======================================================================================================================================================")
-            time.sleep(1)
-            update_log_state()
-            strategy_state = StrategyState(log_state)
-            index, args = strategy_state.best_h_index_arg()
-            my_index, oppo_index = strategy_state.get_best_attack_target()
-            if index == -2:
-                click.end_turn()
-                time.sleep(STATE_CHECK_INTERVAL)
-            else:
-                continue
+        # # my_index == -1代表英雄攻击, -2 代表不攻击
+        # if my_index != -2:
+        #     strategy_state.my_entity_attack_oppo(my_index, oppo_index)
+        # else:
+        #     print("======================================================================================================================================================")
+        #     time.sleep(1)
+        #     update_log_state()
+        #     strategy_state = StrategyState(log_state)
+        #     index, args = strategy_state.best_h_index_arg()
+        #     my_index, oppo_index = strategy_state.get_best_attack_target()
+        #     if index == -2:
+        #         click.end_turn()
+        #         time.sleep(STATE_CHECK_INTERVAL)
+        #     else:
+        #         continue
             # else:
             #     click.end_turn()
             #     time.sleep(STATE_CHECK_INTERVAL)
