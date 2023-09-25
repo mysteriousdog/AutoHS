@@ -373,7 +373,6 @@ def get_best_solution(strategy_state, action_list, k):
             # print("strategy_state.my_last_mana is :", strategy_state.my_last_mana)
             # print("temp_state.my_last_mana is :", temp_state.my_last_mana)
             if len(states) == 0:
-                print("break!!!!!!!!!!!!!!!!!!")
                 continue
             
             # best_action.append(action)
@@ -524,10 +523,9 @@ def Battling():
             click.commit_error_report()
             click.cancel_click()
             time.sleep(STATE_CHECK_INTERVAL)
-
-        debug_print("-" * 60)
-        ok = update_log_state()
-        ok = update_log_state()
+        time.sleep(1)
+        # ok = update_log_state()
+        # ok = update_log_state()
         ok = update_log_state()
         strategy_state = StrategyState(log_state)
         strategy_state.debug_print_out()
@@ -537,9 +535,14 @@ def Battling():
             click.end_turn()
             time.sleep(STATE_CHECK_INTERVAL)
         best_action = best_action[0]
+        strategy_state = StrategyState(log_state)
         if best_action.is_in_hand:
             if best_action.hand_index == -2:
-                index = -1
+                if strategy_state.my_hero_power.exhausted or strategy_state.my_last_mana < 2:
+                    click.end_turn()
+                    continue
+                else:
+                    index = -1
             else:
                 index = best_action.hand_index
             args = []
