@@ -30,6 +30,9 @@ for email in emails:
     a += generate_variants(email)
 
 print(len(a))
+passwd = input('Enter a passwd: ')
 for b in a:
-    print(b)
-    
+    print(b, " ", passwd)
+
+
+
