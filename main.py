@@ -10,7 +10,7 @@ from click import enter_HS_step_2
 
 
 if __name__ == "__main__":
-    # check_name()
+    check_name()
     print_info_init()
     init()
     read_passwd_file(r'value.txt')

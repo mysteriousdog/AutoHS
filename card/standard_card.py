@@ -351,9 +351,6 @@ class BrandonKitkouski(SpellNoPoint):
     
     @classmethod
     def best_h_and_arg(cls, state, hand_card_index):
-        if state.BrandonKitkouski_used_before == 0:
-            state.BrandonKitkouski_used_before = 1
-            return 1000000,
         if state.BrandonKitkouski_used_before == 1:
             for entity in state.my_graveyard:
                 if entity.name == "爆炸陷阱":
@@ -372,8 +369,9 @@ class BrandonKitkouski(SpellNoPoint):
         
         val = cls.best_h_and_arg(state, 0)[0]
         if val == -99999999:
-            return -9999, [state]
+            return -9999, []
         del state.my_hand_cards[index]
+        state.BrandonKitkouski_used_before = 1
         return val, [state]
 
     @classmethod
@@ -411,7 +409,7 @@ class QuickShot(SpellPointOppo):
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
         if state.my_hand_cards[index].current_cost > state.my_last_mana:
-            return -9999, [state]
+            return -9999, []
         state.pay_mana(state.my_hand_cards[index].current_cost)
         del state.my_hand_cards[index]
         add_val = 0
@@ -520,7 +518,7 @@ class AnimalCompanion(SpellNoPoint):
         s2 = strategy_entity.StrategyMinion(card_id = 'NEW1_034', zone = 'PLAY', zone_pos = state2.my_minion_num + 1,
                  current_cost = 3, overload = 0, is_mine = 1,
                  attack = 4, max_health = 2,
-                 exhausted = 1)
+                 exhausted = 0)
         state2.my_minions.append(s2)
         state2.pay_mana(3)
         # s3 = strategy_entity.StrategyMinion(attack = 2, max_healt = 4)
@@ -838,7 +836,7 @@ class DragonDestroyingCrossbow(MinionNoPoint):
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 # 草原狮
 class GrasslandLion(MinionNoPoint):
-    value = 12 - 6 + 4
+    value = 12 - 6 + 8
     keep_in_hand_bool = False
 
     @classmethod
@@ -920,16 +918,15 @@ class Docent(MinionNoPoint):
 
 # 蜡烛弓
 class Candlebow(WeaponCard):
-    keep_in_hand_bool = False
+    keep_in_hand_bool = True
     value =  1
     
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        if state.my_weapon:
-            cls.value -= state.my_weapon.attack * state.my_weapon.durability
-            print("============================ state.my_weapon.attack ", state.my_weapon.attack, " value ", cls.value)
-            print("============================ state.my_weapon.durability is ", state.my_weapon.durability)
+
+        if state.my_weapon is not None:
+            cls.value =  cls.value  - (state.my_weapon.attack * state.my_weapon.durability)
         state.my_weapon = state.my_hand_cards[index]
         state.pay_mana(state.my_hand_cards[index].current_cost)
         del state.my_hand_cards[index]

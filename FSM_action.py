@@ -27,7 +27,7 @@ passwd_list = []
 passwd_index = 0
 my_user = ''
 my_passwd = ''
-
+save_path = ''
 
 def dump_data_x(data_x):
     with open('data_x.txt', 'w') as file:
@@ -142,7 +142,7 @@ def enter_battle_from_login():
 
 
 def init():
-    global log_state, log_iter, choose_hero_count
+    global log_state, log_iter, choose_hero_count, save_path
 
     # 有时候炉石退出时python握着Power.log的读锁, 因而炉石无法
     # 删除Power.log. 而当炉石重启时, 炉石会从头开始写Power.log,
@@ -153,11 +153,11 @@ def init():
     # 日志是关于当前打开的炉石的, 那么炉石会持有此文件的写锁, 使脚本无法
     # 清空日志. 这使得脚本不会清空有意义的日志
     # read_passwd_file(r'value.txt')
-    print(HEARTHSTONE_POWER_LOG_PATH)
-    # log_path = delete_smaller_subdirectories(r"C:\Program Files (x86)\Apps\Hearthstone\Logs")
-    # log_path += r"\Power.log"
+    # print(HEARTHSTONE_POWER_LOG_PATH)
+    log_path = delete_smaller_subdirectories(r"C:\Program Files (x86)\Apps\Hearthstone\Logs")
+    log_path += r"\Power.log"
     # print(log_path)
-    log_path = HEARTHSTONE_POWER_LOG_PATH
+    # log_path = "Power.log"
     if os.path.exists(log_path):
         try:
             file_handle = open(log_path, "w")
@@ -168,7 +168,7 @@ def init():
             warn_print("Fail to truncate Power.log, maybe someone is using it")
     else:
         info_print("Power.log does not exist")
-
+    save_path = log_path
     log_state = LogState()
     log_iter = log_iter_func(log_path)
     choose_hero_count = 0
@@ -362,6 +362,7 @@ def get_best_solution(strategy_state, action_list, k):
     for actions in action_list:
         for action in actions:
             temp_val = 0
+            states = []
             # print("in get_best_solution actions len is ", len(actions))
             # action.show_action()
             temp_state = copy.deepcopy(strategy_state)
@@ -411,40 +412,30 @@ def test_battle():
     init()
     update_log_state()
     strategy_state = StrategyState(log_state)
-    temp_state = copy.deepcopy(strategy_state)
-    # a= {}
-    # print(temp_state.get_hash())
-    # if temp_state.get_hash() not in a:
-    #     print(1)
-    #     a[temp_state.get_hash()] = 1
-    # print(" ", strategy_state.get_hash() in a)
-    # print(a[strategy_state.get_hash()])
-    input_info = strategy_state.debug_print_out()
     action_list = strategy_state.get_action_list()
-    input_info = strategy_state.debug_print_out()
-    print(action_list)
     from datetime import datetime
-
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S") + "." + now.strftime("%S")
+    strategy_state.debug_print_out()
+    # now = datetime.now()
+    # current_time = now.strftime("%Y-%m-%d %H:%M:%S") + "." + now.strftime("%S")
     # for actions in action_list:
     #     if not actions:
     #         continue
     #     for action in actions:
     #         action.show_action()
-    print("当前时间1：", current_time)
+    # print("当前时间1：", current_time)
     max_val, best_action = get_best_solution(strategy_state, action_list, 0)
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H:%M:%S") + "." + now.strftime("%S")
-    print("当前时间2：", current_time)
-    print("max_val is ", max_val)
+    # now = datetime.now()
+    # current_time = now.strftime("%Y-%m-%d %H:%M:%S") + "." + now.strftime("%S")
+    # print("当前时间2：", current_time)
+    # print("max_val is ", max_val)
     for action in best_action:
         action.show_action()
+        # break
 
 def Battling():
     global win_count
     global log_state
-
+    global good_dic
     print_out()
     
     not_mine_count = 0
@@ -528,12 +519,32 @@ def Battling():
         # ok = update_log_state()
         ok = update_log_state()
         strategy_state = StrategyState(log_state)
+        # 
+        if log_state.is_end:
+            time.sleep(1)
+            continue
         strategy_state.debug_print_out()
-        action_list = strategy_state.get_action_list()
-        max_val, best_action = get_best_solution(strategy_state, action_list, 0)
+        good_dic = {}
+        try:
+            action_list = strategy_state.get_action_list()
+            max_val, best_action = get_best_solution(strategy_state, action_list, 0)
+        except:
+            print("err=======================================================================================")
+            import shutil
+            global save_path
+            # 源文件路径
+            source_file = save_path
+
+            # 目标文件路径
+            destination_file = 'Power.log1'
+
+            # 复制文件
+            shutil.copy(source_file, destination_file)
+            return FSM_ERROR
         if len(best_action) == 0:
             click.end_turn()
             time.sleep(STATE_CHECK_INTERVAL)
+            continue
         best_action = best_action[0]
         strategy_state = StrategyState(log_state)
         if best_action.is_in_hand:
@@ -553,8 +564,11 @@ def Battling():
             elif best_action.point_self != -3:
                 args.append(best_action.point_self)
             else:
-                print("err in action !!!!!!!!!!!!!!!!!!!!!!!!!!")
-                continue
+                args.append(0)
+                # print("err in action !!!!!!!!!!!!!!!!!!!!!!!!!!")
+                # best_action.show_action()
+                # click.end_turn()
+                # time.sleep(STATE_CHECK_INTERVAL)
             strategy_state.use_best_entity(index, args)
             continue
         else:

@@ -148,6 +148,7 @@ class Action():
                 val = val_add - val_dec
                 state.my_hero.exhausted = 1
                 if state.my_weapon is not None:
+                    # print("my_weapon durability is ================================", state.my_weapon.durability)
                     state.my_weapon.durability -= 1
                     val -= (state.my_weapon.attack / 2)
                     if state.my_weapon.durability <= 0:
@@ -167,22 +168,27 @@ class Action():
             return detail_card.delta_h_after_direct(cls, state)
         # print("????????????????????????????")
         if cls.is_in_battle:
+            # print("111 action.battle_index ", cls.battle_index)
+            # print("111 action.point_oppo ", cls.point_oppo)
             if cls.point_oppo == -1:
                 val = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
                 state.oppo_hero.get_damaged(cls.cost_damage)
                 state.my_minions[cls.battle_index].exhausted = 1
                 if state.oppo_hero.health <= 0:
                     val = 999999
+                # print("111 - 1 action.val ", val)
                 return val, [state]
             if cls.point_oppo >= 0 and cls.point_oppo <= 6:
                 val = state.oppo_minions[cls.point_oppo].delta_h_after_damage(cls.cost_damage)
                 oppo_val = state.oppo_minions[cls.point_oppo].get_damaged(cls.cost_damage)
+                val -= state.my_minions[cls.battle_index].delta_h_after_damage(cls.cost_damage)
                 my_val = state.my_minions[cls.battle_index].get_damaged(state.oppo_minions[cls.point_oppo].attack)
                 state.my_minions[cls.battle_index].exhausted = 1
                 if oppo_val:
                     del state.oppo_minions[cls.point_oppo]
                 if my_val:
                     del state.my_minions[cls.battle_index]
+                # print("111 - 2 action.val ", val, "oppo_val is", oppo_val)
                 return val, [state]
             return 0, []
             # if cls.point_self == -1:
@@ -195,8 +201,9 @@ class Action():
             #     return val, [state]
                 # state.my_hero.delta_h_after_damage()
         else:
-            print("err in unknow hand card!")
-            return 0, [state]
+            # print("err in unknow hand card!")
+            del state.my_hand_cards[cls.hand_index]
+            return -10, [state]
         
 
 
@@ -276,6 +283,7 @@ class StrategyState:
         self.Hero_power_cost_dec_num = self.my_hero_power.current_cost
         
     def get_heroPowerCost(self):
+        return 2
         return self.my_hero_power.current_cost - self.Hero_power_cost_dec_num
     
     def use_heroPower(self):
@@ -347,7 +355,7 @@ class StrategyState:
         # print("!!!!!!!!!!!!!!!!!!!!!!!!!!self.my_hero_power.exhausted is", self.my_hero_power.exhausted)
         # if self.my_last_mana > 0:
         # from card.standard_card import Hero_power_cost_dec_num
-        if not self.my_hero_power.exhausted and self.my_last_mana >= (self.get_heroPowerCost()):
+        if not self.my_hero_power.exhausted and self.my_hero_power.exhausted != 1 and self.my_last_mana >= (self.get_heroPowerCost()):
             # print(" my hero power can attack!")
             actions = []
             action = Action()
@@ -577,7 +585,7 @@ class StrategyState:
         return self.my_total_mana - self.my_used_mana + self.my_temp_mana
     
     def pay_mana(self, mana_num):
-        if mana_num + self.my_used_mana - self.my_total_mana > 0:
+        if mana_num + self.my_used_mana - self.my_total_mana - self.my_temp_mana > 0:
             print("err in  pay_mana!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!, mana_num is :", mana_num, "my_used_mana is ", self.my_used_mana, " my_total_mana is :", self.my_total_mana)
             return False
         self.my_used_mana += mana_num

@@ -245,7 +245,7 @@ class StrategyMinion(StrategyEntity):
                 h_val += self.attack / 4
 
         h_val *= CRITICAL_MINION.get(self.card_id, 1)
-
+        # print("h_val ", h_val)
         return h_val
 
     def get_damaged(self, damage):

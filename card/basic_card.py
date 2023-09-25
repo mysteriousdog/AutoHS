@@ -170,6 +170,8 @@ class MinionCard(Card):
     
     @classmethod
     def delta_h_after_direct_cls(cls, action, state):
+        # print("action.battle_index ", action.battle_index)
+        # print("action.point_oppo ", action.point_oppo)
         if action.is_in_battle:
             if action.point_oppo == -1:
                 oppo_atk = 0
@@ -180,7 +182,7 @@ class MinionCard(Card):
                 oppo_atk = oppo_minion.attack
             me = state.my_minions[action.battle_index]
             if me.exhausted and me.attackable_by_rush == 0:
-                return 0, [state]
+                return 0, []
             if action.point_oppo != -1:
                 val_del = me.delta_h_after_damage(oppo_atk)
             
@@ -196,7 +198,7 @@ class MinionCard(Card):
             if me.get_damaged(oppo_atk):
                 del state.my_minions[action.battle_index]
             val = val_add - val_del
-            # print("=============================val_add is ", val_add, " val_del is ", val_del, "oppo index is ", action.point_oppo)
+            # print("=============================val_add is ", val_add, " val_del is ", val_del, "oppo index is ", action.point_oppo, "val = ", val)
             return val , [state]
 
     @classmethod
@@ -398,5 +400,5 @@ class Coin(SpellNoPoint):
     def delta_h_after_direct(cls, action, state):
         del state.my_hand_cards[action.hand_index]
         state.pay_mana(-1)
-        return 1, [state]
+        return -0.2, [state]
 
