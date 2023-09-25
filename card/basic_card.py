@@ -396,5 +396,5 @@ class Coin(SpellNoPoint):
     def delta_h_after_direct(cls, action, state):
         del state.my_hand_cards[action.hand_index]
         state.pay_mana(-1)
-        return 1, [state]
+        return -1, [state]
 
