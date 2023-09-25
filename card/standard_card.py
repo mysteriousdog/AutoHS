@@ -416,17 +416,20 @@ class QuickShot(SpellPointOppo):
         del state.my_hand_cards[index]
         add_val = 0
         if len(state.my_hand_cards) == 0:
-            print("------------------------------------------------------------------------------------------------------------------------------------------")
             add_val = 999
         oppo_index = action.point_oppo
         if oppo_index == -1:
             val = state.oppo_hero.delta_h_after_damage(3) + add_val + cls.bias
             state.oppo_hero.get_damaged(3)
+            if state.oppo_hero.health <= 0:
+                val = 999999
             return val, [state]
-        
-        val = state.oppo_minions[oppo_index].delta_h_after_damage(3) + add_val + cls.bias
-        if state.oppo_minions[oppo_index].get_damaged(3):
-            del state.oppo_minions[oppo_index]
+        elif oppo_index >= 0 and oppo_index <= 6:
+            val = state.oppo_minions[oppo_index].delta_h_after_damage(3) + add_val + cls.bias
+            if state.oppo_minions[oppo_index].get_damaged(3):
+                del state.oppo_minions[oppo_index]
+        else:
+            return 0, []
         return val, [state]
 
 
@@ -467,7 +470,7 @@ class DeadlyShot(SpellNoPoint):
         values = cls.bias
         oppo_num = len(state.oppo_minions)
         if oppo_num == 0:
-            return -9999, [state]
+            return -9999, []
         for oppo_index, oppo_minion in enumerate(state.oppo_minions):
             statex = copy.deepcopy(state)
             statex.pay_mana(state.my_hand_cards[index].current_cost)
@@ -498,10 +501,10 @@ class AnimalCompanion(SpellNoPoint):
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
         if state.my_last_mana < state.my_hand_cards[index].current_cost:
-            return -999, [state]
+            return -999, []
         del state.my_hand_cards[index]
         states = []
-        values = (10 + 9 + 7) / 3 + cls.bias
+        values = (10 + 9 + 9) / 3 + cls.bias
         import strategy_entity
         
         # s1 = strategy_entity.StrategyMinion(attack = 4, taunt = 1, max_health = 4)
@@ -817,7 +820,7 @@ class BlueDrogen(MinionNoPoint):
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 
 class DragonDestroyingCrossbow(MinionNoPoint):
-    value = 8 - 5 + 2
+    value = 8 - 5 + 1
     keep_in_hand_bool = False
 
     @classmethod
@@ -826,8 +829,6 @@ class DragonDestroyingCrossbow(MinionNoPoint):
             return cls.delta_h_after_direct_hand_no_point( action, state)
         if action.is_in_battle:
             return cls.delta_h_after_direct_cls( action, state)
-
-
     
     @classmethod
     def get_all_actions(cls, state, index, is_in_hand):
@@ -837,7 +838,7 @@ class DragonDestroyingCrossbow(MinionNoPoint):
             return cls.get_all_actions_MinionNoPoint_inbattle(state, index, is_in_hand)
 # 草原狮
 class GrasslandLion(MinionNoPoint):
-    value = 12 - 6 + 2
+    value = 12 - 6 + 4
     keep_in_hand_bool = False
 
     @classmethod
@@ -866,7 +867,7 @@ class LeopardTrick(SpellNoPoint):
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
         if state.my_last_mana < state.my_hand_cards[index].current_cost:
-            return -999, [state]
+            return -999, []
         state.pay_mana(state.my_hand_cards[index].current_cost)
         del state.my_hand_cards[index]
         return cls.bias + 4 + 2 + 1, [state]
@@ -883,7 +884,7 @@ class WanderingMonster(SpellNoPoint):
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
         if state.my_last_mana < state.my_hand_cards[index].current_cost:
-            return -999, [state]
+            return -999, []
         state.pay_mana(state.my_hand_cards[index].current_cost)
         del state.my_hand_cards[index]
         return cls.bias + 3 + 3, [state]
@@ -925,7 +926,7 @@ class Candlebow(WeaponCard):
     @classmethod
     def delta_h_after_direct(cls, action, state):
         index = action.hand_index
-        if state.my_weapon is not None:
+        if state.my_weapon:
             cls.value -= state.my_weapon.attack * state.my_weapon.durability
             print("============================ state.my_weapon.attack ", state.my_weapon.attack, " value ", cls.value)
             print("============================ state.my_weapon.durability is ", state.my_weapon.durability)
