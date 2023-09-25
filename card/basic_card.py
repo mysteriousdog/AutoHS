@@ -213,6 +213,8 @@ class MinionCard(Card):
             state.pay_mana(state.my_hand_cards[index].current_cost)
             del state.my_hand_cards[index]
             return cls.value, [state]
+        else:
+            return 0, []
     
     @classmethod
     def get_all_actions_MinionNoPoint_inbattle(cls, state, index, is_in_hand):
@@ -396,5 +398,5 @@ class Coin(SpellNoPoint):
     def delta_h_after_direct(cls, action, state):
         del state.my_hand_cards[action.hand_index]
         state.pay_mana(-1)
-        return -1, [state]
+        return 1, [state]
 
