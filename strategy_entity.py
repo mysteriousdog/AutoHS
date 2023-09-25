@@ -424,11 +424,13 @@ class StrategyHero(StrategyEntity):
         if self.health <= 0:
             return val * 1000
         if self.health <= 5:
-            return val * 5
+            return val * 20
         if self.health <= 10:
-            return val * 3
+            return val * 10
+        if self.health <= 15:
+            return val * 8
         if self.health <= 20:
-            return val * 1.6
+            return val * 4
         else:
             return val
         
