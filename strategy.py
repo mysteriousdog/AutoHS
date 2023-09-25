@@ -121,33 +121,39 @@ class Action():
             if cls.hand_index == -2:
                 # from card.standard_card import Hero_power_cost_dec_num
                 if (state.my_last_mana < (state.get_heroPowerCost())) or state.my_hero_power.exhausted:
-                    return -99, [state]
+                    return -99, []
                 return state.use_heroPower()
                 state.my_hero_power.exhausted = True
                 val = state.oppo_hero.delta_h_after_damage(2)
                 state.oppo_hero.get_damaged(2)
                 return val, [state]
             if cls.hand_index == -1:
+                val_add = 0
+                val_dec = 0
                 if state.my_hero.exhausted:
                     return 0, []
                 if cls.point_oppo == -1:
-                    val = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
+                    val_add = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
                     state.oppo_hero.get_damaged(cls.cost_damage)
                 elif cls.point_oppo >= 0 and cls.point_oppo <= 6:
                     val_add = state.oppo_minions[cls.point_oppo].delta_h_after_damage(cls.cost_damage)
                     if state.my_hero.health - state.oppo_minions[cls.point_oppo].attack <= 0:
-                        return -99999, [state]
+                        return -99999, []
                     val_dec = state.my_hero.delta_h_after_damage(state.oppo_minions[cls.point_oppo].attack)
                     state.my_hero.get_damaged(state.oppo_minions[cls.point_oppo].attack)
                     if state.oppo_minions[cls.point_oppo].get_damaged(cls.cost_damage):
                         del state.oppo_minions[cls.point_oppo]
-                    val = val_add -val_dec
+                else:
+                    return -1, []
+                val = val_add - val_dec
                 state.my_hero.exhausted = 1
                 if state.my_weapon is not None:
                     state.my_weapon.durability -= 1
-                    val -= state.my_weapon.attack / 2
+                    val -= (state.my_weapon.attack / 2)
                     if state.my_weapon.durability <= 0:
                         state.my_weapon = None
+                if state.oppo_hero.health <= 0:
+                    val = 999999
                 return val, [state]
             if cls.hand_index >= 0 and cls.hand_index <= 6:
                 if state.my_hand_cards[cls.hand_index].current_cost > state.my_last_mana:
@@ -155,6 +161,8 @@ class Action():
                 detail_card = state.my_hand_cards[cls.hand_index].detail_card
         elif cls.is_in_battle:
             detail_card = state.my_minions[cls.battle_index].detail_card
+        else:
+            return 0, []
         if detail_card:
             return detail_card.delta_h_after_direct(cls, state)
         # print("????????????????????????????")
@@ -163,6 +171,8 @@ class Action():
                 val = state.oppo_hero.delta_h_after_damage(cls.cost_damage)
                 state.oppo_hero.get_damaged(cls.cost_damage)
                 state.my_minions[cls.battle_index].exhausted = 1
+                if state.oppo_hero.health <= 0:
+                    val = 999999
                 return val, [state]
             if cls.point_oppo >= 0 and cls.point_oppo <= 6:
                 val = state.oppo_minions[cls.point_oppo].delta_h_after_damage(cls.cost_damage)
@@ -174,6 +184,7 @@ class Action():
                 if my_val:
                     del state.my_minions[cls.battle_index]
                 return val, [state]
+            return 0, []
             # if cls.point_self == -1:
             #     val = state.my_hero.delta_h_after_heal(cls.cost_heal)
             #     state.my_hero.get_heal(cls.cost_heal)
@@ -287,6 +298,10 @@ class StrategyState:
                     if oppo_minion.get_damaged(5):
                         del statex.oppo_minions[oppo_index]
                     states.append(statex)
+                statex = copy.deepcopy(self)
+                val2 += statex.oppo_hero.delta_h_after_damage(5)
+                statex.oppo_hero.get_damaged(5)
+                states.append(statex)
                 return val + val2 / len(states), states
         return val, [self] 
     
