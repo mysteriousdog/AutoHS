@@ -549,13 +549,22 @@ def Battling():
         strategy_state = StrategyState(log_state)
         if best_action.is_in_hand:
             if best_action.hand_index == -2:
+                print("--------------------------- -2, strategy_state.my_hero_power.exhausted is ", strategy_state.my_hero_power.exhausted)
+                print("--------------------------- -2, strategy_state.my_last_mana is ", strategy_state.my_last_mana)
                 if strategy_state.my_hero_power.exhausted or strategy_state.my_last_mana < 2:
-                    click.end_turn()
+                    time.sleep(1)
+                    update_log_state()
+                    # click.end_turn()
                     continue
                 else:
                     index = -1
             else:
                 index = best_action.hand_index
+                if index == -1:
+                    oppo_index = best_action.point_oppo
+                    strategy_state.my_entity_attack_oppo(index, oppo_index)
+                    time.sleep(1)
+                    continue
             args = []
             if best_action.put_index != -3:
                 args.append(best_action.put_index)
@@ -682,7 +691,7 @@ def GoBackHSAction():
     while not get_screen.test_hs_available():
         if quitting_flag:
             sys.exit(0)
-        click.enter_HS()
+        click.back_game_enter_HS()
         time.sleep(10)
 
     # 有时候炉石进程会直接重写Power.log, 这时应该重新创建文件操作句柄
@@ -788,4 +797,5 @@ def AutoHS_automata(is_single=0):
 
 
 if __name__ == "__main__":
-    test_battle()
+    GoBackHSAction()
+    # click.back_game_enter_HS()

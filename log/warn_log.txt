@@ -1,1 +1,0 @@
-[23:51:58 WARN] Fail to truncate Power.log, maybe someone is using it

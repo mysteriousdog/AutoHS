@@ -1,4 +1,708 @@
-[23:52:09 SYS] Enter State Choosing Card
-[23:52:09 SYS] The 1 game begins
-[23:52:30 SYS] Read in new game and flush state
-[23:52:40 SYS] 一共完成了1场对战, 赢了0场
+[23:54:14 SYS] Enter State Main Menu
+[23:54:23 SYS] Enter State Choosing Hero
+[23:54:27 SYS] Enter State Match Opponent
+[23:54:51 SYS] Read in new game and flush state
+[23:54:51 SYS] Enter State Choosing Card
+[23:54:51 SYS] The 1 game begins
+[23:55:18 SYS] Read in new game and flush state
+[23:55:29 SYS] Enter State Battling
+[00:01:20 SYS] Enter State Quitting Battle
+[00:01:20 SYS] The 1 game ends
+[00:01:35 SYS] Enter State Choosing Hero
+[00:01:39 SYS] Enter State Match Opponent
+[00:01:56 SYS] Read in new game and flush state
+[00:01:56 SYS] Enter State Choosing Card
+[00:01:56 SYS] The 2 game begins
+[00:02:22 SYS] Read in new game and flush state
+[00:02:22 SYS] Read in new game and flush state
+[00:02:42 SYS] Enter State Battling
+[00:09:36 SYS] Enter State Quitting Battle
+[00:09:36 SYS] The 2 game ends
+[00:09:48 SYS] Enter State Choosing Hero
+[00:09:53 SYS] Enter State Match Opponent
+[00:10:13 SYS] Read in new game and flush state
+[00:10:13 SYS] Enter State Choosing Card
+[00:10:13 SYS] The 3 game begins
+[00:10:40 SYS] Read in new game and flush state
+[00:10:40 SYS] Read in new game and flush state
+[00:10:40 SYS] Read in new game and flush state
+[00:10:51 SYS] Enter State Battling
+[00:29:41 SYS] Enter State Quitting Battle
+[00:29:41 SYS] The 3 game ends
+[00:29:56 SYS] Enter State Choosing Hero
+[00:30:01 SYS] Enter State Match Opponent
+[00:30:13 SYS] Read in new game and flush state
+[00:30:13 SYS] Enter State Choosing Card
+[00:30:13 SYS] The 4 game begins
+[00:30:40 SYS] Read in new game and flush state
+[00:30:40 SYS] Read in new game and flush state
+[00:30:40 SYS] Read in new game and flush state
+[00:30:40 SYS] Read in new game and flush state
+[00:31:01 SYS] Enter State Battling
+[00:43:43 SYS] Enter State Quitting Battle
+[00:43:43 SYS] The 4 game ends
+[00:43:58 SYS] Enter State Choosing Hero
+[00:44:02 SYS] Enter State Match Opponent
+[00:44:13 SYS] Read in new game and flush state
+[00:44:13 SYS] Enter State Choosing Card
+[00:44:13 SYS] The 5 game begins
+[00:44:40 SYS] Read in new game and flush state
+[00:44:40 SYS] Read in new game and flush state
+[00:44:40 SYS] Read in new game and flush state
+[00:44:40 SYS] Read in new game and flush state
+[00:44:40 SYS] Read in new game and flush state
+[00:45:07 SYS] Enter State Battling
+[00:54:01 SYS] Enter State Quitting Battle
+[00:54:01 SYS] The 5 game ends
+[00:54:16 SYS] Enter State Choosing Hero
+[00:54:20 SYS] Enter State Match Opponent
+[00:54:25 SYS] Read in new game and flush state
+[00:54:25 SYS] Enter State Choosing Card
+[00:54:25 SYS] The 6 game begins
+[00:54:51 SYS] Read in new game and flush state
+[00:54:51 SYS] Read in new game and flush state
+[00:54:51 SYS] Read in new game and flush state
+[00:54:51 SYS] Read in new game and flush state
+[00:54:51 SYS] Read in new game and flush state
+[00:54:51 SYS] Read in new game and flush state
+[00:55:12 SYS] Enter State Battling
+[01:00:22 SYS] Enter State Quitting Battle
+[01:00:22 SYS] The 6 game ends
+[01:00:34 SYS] Enter State Choosing Hero
+[01:00:39 SYS] Enter State Match Opponent
+[01:00:57 SYS] Read in new game and flush state
+[01:00:57 SYS] Enter State Choosing Card
+[01:00:57 SYS] The 7 game begins
+[01:01:24 SYS] Read in new game and flush state
+[01:01:24 SYS] Read in new game and flush state
+[01:01:24 SYS] Read in new game and flush state
+[01:01:24 SYS] Read in new game and flush state
+[01:01:24 SYS] Read in new game and flush state
+[01:01:24 SYS] Read in new game and flush state
+[01:01:24 SYS] Read in new game and flush state
+[01:01:36 SYS] Enter State Battling
+[01:08:17 SYS] Enter State Quitting Battle
+[01:08:17 SYS] The 7 game ends
+[01:08:32 SYS] Enter State Choosing Hero
+[01:08:36 SYS] Enter State Match Opponent
+[01:08:52 SYS] Read in new game and flush state
+[01:08:52 SYS] Enter State Choosing Card
+[01:08:52 SYS] The 8 game begins
+[01:09:19 SYS] Read in new game and flush state
+[01:09:19 SYS] Read in new game and flush state
+[01:09:19 SYS] Read in new game and flush state
+[01:09:19 SYS] Read in new game and flush state
+[01:09:19 SYS] Read in new game and flush state
+[01:09:19 SYS] Read in new game and flush state
+[01:09:19 SYS] Read in new game and flush state
+[01:09:19 SYS] Read in new game and flush state
+[01:09:30 SYS] Enter State Battling
+[01:17:21 SYS] Enter State Quitting Battle
+[01:17:21 SYS] The 8 game ends
+[01:17:41 SYS] Enter State Choosing Hero
+[01:17:45 SYS] Enter State Match Opponent
+[01:18:02 SYS] Read in new game and flush state
+[01:18:02 SYS] Enter State Choosing Card
+[01:18:02 SYS] The 9 game begins
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:18:28 SYS] Read in new game and flush state
+[01:19:14 SYS] Enter State Battling
+[01:26:16 SYS] Enter State Quitting Battle
+[01:26:16 SYS] The 9 game ends
+[01:26:31 SYS] Enter State Choosing Hero
+[01:26:35 SYS] Enter State Match Opponent
+[01:26:54 SYS] Read in new game and flush state
+[01:26:54 SYS] Enter State Choosing Card
+[01:26:54 SYS] The 10 game begins
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:21 SYS] Read in new game and flush state
+[01:27:41 SYS] Enter State Battling
+[01:32:54 SYS] Enter State Quitting Battle
+[01:32:54 SYS] The 10 game ends
+[01:33:11 SYS] Enter State Choosing Hero
+[01:33:15 SYS] Enter State Match Opponent
+[01:33:36 SYS] Read in new game and flush state
+[01:33:36 SYS] Enter State Choosing Card
+[01:33:36 SYS] The 11 game begins
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:02 SYS] Read in new game and flush state
+[01:34:14 SYS] Enter State Battling
+[01:42:37 SYS] Enter State Quitting Battle
+[01:42:37 SYS] The 11 game ends
+[01:42:53 SYS] Enter State Choosing Hero
+[01:42:57 SYS] Enter State Match Opponent
+[01:43:15 SYS] Read in new game and flush state
+[01:43:15 SYS] Enter State Choosing Card
+[01:43:15 SYS] The 12 game begins
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:43:42 SYS] Read in new game and flush state
+[01:44:01 SYS] Enter State Battling
+[01:57:16 SYS] Enter State Quitting Battle
+[01:57:16 SYS] The 12 game ends
+[01:57:33 SYS] Enter State Choosing Hero
+[01:57:37 SYS] Enter State Match Opponent
+[01:57:54 SYS] Read in new game and flush state
+[01:57:54 SYS] Enter State Choosing Card
+[01:57:54 SYS] The 13 game begins
+[01:58:20 SYS] Read in new game and flush state
+[01:58:20 SYS] Read in new game and flush state
+[01:58:20 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:21 SYS] Read in new game and flush state
+[01:58:40 SYS] Enter State Battling
+[02:05:04 SYS] Enter State Quitting Battle
+[02:05:04 SYS] The 13 game ends
+[02:05:19 SYS] Enter State Choosing Hero
+[02:05:23 SYS] Enter State Match Opponent
+[02:05:37 SYS] Read in new game and flush state
+[02:05:37 SYS] Enter State Choosing Card
+[02:05:37 SYS] The 14 game begins
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:04 SYS] Read in new game and flush state
+[02:06:17 SYS] Enter State Battling
+[02:12:04 SYS] Enter State Quitting Battle
+[02:12:04 SYS] The 14 game ends
+[02:12:19 SYS] Enter State Choosing Hero
+[02:12:23 SYS] Enter State Match Opponent
+[02:12:42 SYS] Read in new game and flush state
+[02:12:42 SYS] Enter State Choosing Card
+[02:12:42 SYS] The 15 game begins
+[02:13:08 SYS] Read in new game and flush state
+[02:13:08 SYS] Read in new game and flush state
+[02:13:08 SYS] Read in new game and flush state
+[02:13:08 SYS] Read in new game and flush state
+[02:13:08 SYS] Read in new game and flush state
+[02:13:08 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:09 SYS] Read in new game and flush state
+[02:13:20 SYS] Enter State Battling
+[02:17:37 SYS] Enter State Quitting Battle
+[02:17:37 SYS] The 15 game ends
+[02:17:52 SYS] Enter State Choosing Hero
+[02:17:56 SYS] Enter State Match Opponent
+[02:18:13 SYS] Read in new game and flush state
+[02:18:13 SYS] Enter State Choosing Card
+[02:18:13 SYS] The 16 game begins
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:18:40 SYS] Read in new game and flush state
+[02:19:01 SYS] Enter State Battling
+[02:25:02 SYS] Enter State Quitting Battle
+[02:25:02 SYS] The 16 game ends
+[02:25:17 SYS] Enter State Choosing Hero
+[02:25:21 SYS] Enter State Match Opponent
+[02:25:37 SYS] Read in new game and flush state
+[02:25:37 SYS] Enter State Choosing Card
+[02:25:37 SYS] The 17 game begins
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:04 SYS] Read in new game and flush state
+[02:26:25 SYS] Enter State Battling
+[02:30:17 SYS] Enter State Quitting Battle
+[02:30:17 SYS] The 17 game ends
+[02:30:34 SYS] Enter State Choosing Hero
+[02:30:38 SYS] Enter State Match Opponent
+[02:30:44 SYS] Read in new game and flush state
+[02:30:44 SYS] Enter State Choosing Card
+[02:30:44 SYS] The 18 game begins
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:11 SYS] Read in new game and flush state
+[02:31:30 SYS] Enter State Battling
+[02:45:10 SYS] Enter State Quitting Battle
+[02:45:10 SYS] The 18 game ends
+[02:45:25 SYS] Enter State Choosing Hero
+[02:45:29 SYS] Enter State Match Opponent
+[02:45:43 SYS] Read in new game and flush state
+[02:45:43 SYS] Enter State Choosing Card
+[02:45:43 SYS] The 19 game begins
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:10 SYS] Read in new game and flush state
+[02:46:22 SYS] Enter State Battling
+[02:52:01 SYS] Enter State Quitting Battle
+[02:52:01 SYS] The 19 game ends
+[02:52:18 SYS] Enter State Choosing Hero
+[02:52:22 SYS] Enter State Match Opponent
+[02:52:30 SYS] Read in new game and flush state
+[02:52:30 SYS] Enter State Choosing Card
+[02:52:30 SYS] The 20 game begins
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:52:57 SYS] Read in new game and flush state
+[02:53:17 SYS] Enter State Battling
+[03:10:43 SYS] Enter State Quitting Battle
+[03:10:43 SYS] The 20 game ends
+[03:11:00 SYS] Enter State Choosing Hero
+[03:11:04 SYS] Enter State Match Opponent
+[03:11:17 SYS] Read in new game and flush state
+[03:11:17 SYS] Enter State Choosing Card
+[03:11:17 SYS] The 21 game begins
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:44 SYS] Read in new game and flush state
+[03:11:55 SYS] Enter State Battling
+[03:27:43 SYS] Enter State Quitting Battle
+[03:27:43 SYS] The 21 game ends
+[03:27:58 SYS] Enter State Choosing Hero
+[03:28:02 SYS] Enter State Match Opponent
+[03:28:13 SYS] Read in new game and flush state
+[03:28:13 SYS] Enter State Choosing Card
+[03:28:13 SYS] The 22 game begins
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:40 SYS] Read in new game and flush state
+[03:28:51 SYS] Enter State Battling
+[03:38:21 SYS] Enter State Quitting Battle
+[03:38:21 SYS] The 22 game ends
+[03:38:36 SYS] Enter State Choosing Hero
+[03:38:40 SYS] Enter State Match Opponent
+[03:38:55 SYS] Read in new game and flush state
+[03:38:55 SYS] Enter State Choosing Card
+[03:38:55 SYS] The 23 game begins
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:22 SYS] Read in new game and flush state
+[03:39:44 SYS] Enter State Battling
+[03:49:34 SYS] Enter State Quitting Battle
+[03:49:34 SYS] The 23 game ends
+[03:49:49 SYS] Enter State Choosing Hero
+[03:49:53 SYS] Enter State Match Opponent
+[03:50:08 SYS] Read in new game and flush state
+[03:50:08 SYS] Enter State Choosing Card
+[03:50:08 SYS] The 24 game begins
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:35 SYS] Read in new game and flush state
+[03:50:54 SYS] Enter State Battling
+[04:01:54 SYS] Enter State Quitting Battle
+[04:01:54 SYS] The 24 game ends
+[04:02:11 SYS] Enter State Choosing Hero
+[04:02:15 SYS] Enter State Match Opponent
+[04:02:32 SYS] Read in new game and flush state
+[04:02:32 SYS] Enter State Choosing Card
+[04:02:32 SYS] The 25 game begins
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:02:59 SYS] Read in new game and flush state
+[04:03:10 SYS] Enter State Battling
+[04:07:20 SYS] Enter State Quitting Battle
+[04:07:20 SYS] The 25 game ends
+[04:07:35 SYS] Enter State Choosing Hero
+[04:07:39 SYS] Enter State Match Opponent
+[04:07:43 SYS] Read in new game and flush state
+[04:07:43 SYS] Enter State Choosing Card
+[04:07:43 SYS] The 26 game begins
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:10 SYS] Read in new game and flush state
+[04:08:22 SYS] Enter State Battling
+[04:16:49 SYS] Enter State Quitting Battle
+[04:16:49 SYS] The 26 game ends
+[04:17:04 SYS] Enter State Choosing Hero
+[04:17:08 SYS] Enter State Match Opponent
+[04:17:29 SYS] Read in new game and flush state
+[04:17:29 SYS] Enter State Choosing Card
+[04:17:29 SYS] The 27 game begins
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:17:56 SYS] Read in new game and flush state
+[04:18:08 SYS] Enter State Battling
+[04:27:21 SYS] Enter State Quitting Battle
+[04:27:21 SYS] The 27 game ends
+[04:27:35 SYS] Enter State Choosing Hero
+[04:27:39 SYS] Enter State Match Opponent
+[04:27:46 SYS] Read in new game and flush state
+[04:27:46 SYS] Enter State Choosing Card
+[04:27:46 SYS] The 28 game begins
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:13 SYS] Read in new game and flush state
+[04:28:41 SYS] Enter State Battling
+[04:36:36 SYS] Enter State Quitting Battle
+[04:36:36 SYS] The 28 game ends
+[04:36:51 SYS] Enter State Choosing Hero
+[04:36:55 SYS] Enter State Match Opponent
+[04:37:11 SYS] Read in new game and flush state
+[04:37:11 SYS] Enter State Choosing Card
+[04:37:11 SYS] The 29 game begins
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:37:39 SYS] Read in new game and flush state
+[04:38:00 SYS] Enter State Battling
+[04:42:22 SYS] Enter State Quitting Battle
+[04:42:22 SYS] The 29 game ends
+[04:42:37 SYS] Enter State Choosing Hero
+[04:42:41 SYS] Enter State Match Opponent
+[04:42:55 SYS] Read in new game and flush state
+[04:42:55 SYS] Enter State Choosing Card
+[04:42:55 SYS] The 30 game begins
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:23 SYS] Read in new game and flush state
+[04:43:45 SYS] Enter State Battling
+[04:47:27 SYS] Enter State Quitting Battle
+[04:47:27 SYS] The 30 game ends
+[04:47:52 SYS] Enter State Choosing Hero
+[04:47:57 SYS] Enter State Match Opponent
